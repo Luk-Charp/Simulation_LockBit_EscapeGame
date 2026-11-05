@@ -105,31 +105,6 @@ class Desktop:
             font=("Segoe UI", 11), wraplength=900, justify="left",
         ).pack(anchor="w")
 
-        section_header = tk.Frame(content, bg=COLORS["background"])
-        section_header.pack(fill="x", pady=(0, 12))
-        tk.Label(
-            section_header, text="OUTILS D'INVESTIGATION",
-            bg=COLORS["background"], fg=COLORS["text"],
-            font=("Segoe UI", 10, "bold"),
-        ).pack(side="left")
-        tk.Label(
-            section_header, text="05 APPLICATIONS DISPONIBLES",
-            bg=COLORS["background"], fg=COLORS["muted"],
-            font=("Segoe UI", 8, "bold"),
-        ).pack(side="right")
-
-        apps = tk.Frame(content, bg=COLORS["background"])
-        apps.pack(fill="x")
-        applications = [
-            ("✉", "Messagerie", "Communications et signalements", "mail"),
-            ("▤", "Dossier d'enquête", "Faits, chronologie et preuves", "case"),
-            ("⌘", "Terminal", "Analyse des données", "terminal"),
-            ("◎", "OSINT", "Renseignement en sources ouvertes", "osint"),
-            ("⊕", "Cartographie", "Visualisation des pistes", "map"),
-        ]
-        for symbol, title, description, app_id in applications:
-            self._create_app_card(apps, symbol, title, description, app_id)
-
         lower = tk.Frame(content, bg=COLORS["background"])
         lower.pack(fill="x", pady=(26, 0))
 
@@ -383,16 +358,73 @@ class Desktop:
             )
 
     def _build_taskbar(self) -> None:
-        taskbar = tk.Frame(self.root, bg=COLORS["taskbar"], height=38)
-        taskbar.pack(side="bottom", fill="x")
-        taskbar.pack_propagate(False)
+        """Affiche un dock inférieur inspiré des bureaux Linux."""
+        dock_area = tk.Frame(self.root, bg=COLORS["background"], height=94)
+        dock_area.pack(side="bottom", fill="x")
+        dock_area.pack_propagate(False)
+
+        dock = tk.Frame(
+            dock_area, bg=COLORS["surface"], padx=14, pady=8,
+            highlightbackground=COLORS["border"], highlightthickness=1,
+        )
+        dock.place(relx=0.5, rely=0.43, anchor="center")
+
+        applications = [
+            ("✉", "Messagerie", "mail"),
+            ("▤", "Dossier", "case"),
+            ("⌘", "Terminal", "terminal"),
+            ("◎", "OSINT", "osint"),
+            ("⊕", "Cartographie", "map"),
+        ]
+        self.dock_items = []
+        for symbol, title, app_id in applications:
+            item = tk.Frame(dock, bg=COLORS["surface"], width=88, height=66, cursor="hand2")
+            item.pack(side="left", padx=3)
+            item.pack_propagate(False)
+
+            icon = tk.Label(
+                item, text=symbol, bg=COLORS["surface"], fg=COLORS["accent"],
+                font=("Segoe UI Symbol", 25), cursor="hand2",
+            )
+            icon.pack(pady=(1, 0))
+            label = tk.Label(
+                item, text=title, bg=COLORS["surface"], fg=COLORS["muted"],
+                font=("Segoe UI", 7, "bold"), cursor="hand2",
+            )
+            label.pack()
+            widgets = (item, icon, label)
+            self.dock_items.append((app_id, widgets))
+            for widget in widgets:
+                widget.bind(
+                    "<Button-1>",
+                    lambda _event, selected=app_id: self._open_application(selected),
+                )
+                widget.bind(
+                    "<Enter>",
+                    lambda _event, elements=widgets: self._set_dock_hover(elements, True),
+                )
+                widget.bind(
+                    "<Leave>",
+                    lambda _event, elements=widgets: self._set_dock_hover(elements, False),
+                )
+
+        status_bar = tk.Frame(self.root, bg=COLORS["taskbar"], height=26)
+        status_bar.pack(side="bottom", fill="x")
+        status_bar.pack_propagate(False)
         tk.Label(
-            taskbar, text="●  SYSTÈME OPÉRATIONNEL",
+            status_bar, text="●  SYSTÈME OPÉRATIONNEL",
             bg=COLORS["taskbar"], fg=COLORS["green"],
-            font=("Segoe UI", 8, "bold"),
-        ).pack(side="left", padx=20)
+            font=("Segoe UI", 7, "bold"),
+        ).pack(side="left", padx=18)
         tk.Label(
-            taskbar, text="SIMULATION PÉDAGOGIQUE  •  DONNÉES FICTIVES",
-            bg=COLORS["taskbar"], fg=COLORS["muted"],
-            font=("Segoe UI", 8),
-        ).pack(side="right", padx=20)
+            status_bar, text="SIMULATION PÉDAGOGIQUE  •  DONNÉES FICTIVES",
+            bg=COLORS["taskbar"], fg=COLORS["on_dark_muted"],
+            font=("Segoe UI", 7),
+        ).pack(side="right", padx=18)
+
+    @staticmethod
+    def _set_dock_hover(widgets: tuple, hovered: bool) -> None:
+        """Met en évidence l'application survolée dans le dock."""
+        background = COLORS["card_hover"] if hovered else COLORS["surface"]
+        for widget in widgets:
+            widget.configure(bg=background)
