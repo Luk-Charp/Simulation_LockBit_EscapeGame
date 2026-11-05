@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from interface.theme import COLORS
+from interface.theme import COLORS, center_window
 
 
 class CaseFileWindow:
@@ -12,9 +12,9 @@ class CaseFileWindow:
     def __init__(self, parent: tk.Misc) -> None:
         self.window = tk.Toplevel(parent)
         self.window.title("Dossier d'enquête — Opération Lockdown")
-        self.window.geometry("1050x700")
-        self.window.minsize(850, 560)
+        self.window.transient(parent)
         self.window.configure(bg=COLORS["background"])
+        center_window(self.window, 1000, 660)
         self._configure_style()
         self._build_interface()
 
