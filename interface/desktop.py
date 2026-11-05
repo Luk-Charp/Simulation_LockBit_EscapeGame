@@ -39,12 +39,16 @@ class Desktop:
 
         brand = tk.Frame(top, bg=COLORS["taskbar"])
         brand.pack(side="left", padx=30)
-        tk.Label(
-            brand, text="FBI", bg=COLORS["taskbar"], fg=COLORS["on_dark"],
-            font=("Georgia", 21, "bold"),
-        ).pack(side="left")
+        logo = tk.Canvas(
+            brand, width=48, height=48, bg=COLORS["taskbar"],
+            highlightthickness=0,
+        )
+        logo.pack(side="left", pady=8)
+        logo.create_oval(2, 2, 46, 46, outline=COLORS["gold"], width=2)
+        logo.create_oval(6, 6, 42, 42, outline="#ffffff", width=1)
+        logo.create_text(24, 24, text="FBI", fill="#ffffff", font=("Georgia", 12, "bold"))
         tk.Frame(brand, bg=COLORS["gold"], width=3, height=34).pack(
-            side="left", padx=14, pady=16
+            side="left", padx=12, pady=16
         )
         identity = tk.Frame(brand, bg=COLORS["taskbar"])
         identity.pack(side="left")
