@@ -65,12 +65,12 @@ class VoicemailWindow:
 
         tk.Label(
             header, text="MESSAGERIE VOCALE",
-            bg=COLORS["taskbar"], fg=COLORS["text"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark"],
             font=("Segoe UI", 15, "bold"),
         ).pack(side="left", padx=25, pady=18)
         tk.Label(
             header, text="MESSAGE ENTRANT  •  04 NOV. 2026",
-            bg=COLORS["taskbar"], fg=COLORS["muted"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark_muted"],
             font=("Segoe UI", 9, "bold"),
         ).pack(side="right", padx=25)
 
@@ -110,7 +110,7 @@ class VoicemailWindow:
         self.play_button.pack(side="left")
         self.play_button_label = tk.Label(
             self.play_button, text="▶  Écouter le message",
-            bg=COLORS["accent_dark"], fg=COLORS["text"],
+            bg=COLORS["accent_dark"], fg=COLORS["button_text"],
             font=("Segoe UI", 10, "bold"), cursor="hand2",
         )
         self.play_button_label.pack()
@@ -139,6 +139,7 @@ class VoicemailWindow:
             transcript_frame, wrap="word", yscrollcommand=scrollbar.set,
             bg=COLORS["surface"], fg=COLORS["text"],
             insertbackground=COLORS["text"], relief="flat",
+            highlightthickness=0, borderwidth=0, takefocus=0,
             padx=18, pady=15, font=("Segoe UI", 10),
             spacing1=2, spacing3=8, state="normal",
         )
@@ -157,7 +158,7 @@ class VoicemailWindow:
         tk.Button(
             footer, text="Fermer", command=self.close,
             bg=COLORS["card"], fg=COLORS["text"],
-            activebackground=COLORS["card_hover"],
+            activebackground=COLORS["card_hover"], activeforeground=COLORS["text"],
             relief="flat", padx=18, pady=7, cursor="hand2",
         ).pack(side="right")
 
