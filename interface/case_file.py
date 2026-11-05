@@ -133,15 +133,13 @@ class CaseFileWindow:
         wheel_remainder = {"value": 0.0}
 
         def on_mousewheel(event):
-            widget = event.widget
-            inside_this_canvas = False
-            while widget is not None:
-                if widget is canvas:
-                    inside_this_canvas = True
-                    break
-                widget = getattr(widget, "master", None)
-
-            if not inside_this_canvas:
+            # Les widgets intégrés au Canvas ne sont pas ses enfants Tk directs.
+            # On vérifie donc la position réelle du pointeur à l'écran.
+            left = canvas.winfo_rootx()
+            top = canvas.winfo_rooty()
+            right = left + canvas.winfo_width()
+            bottom = top + canvas.winfo_height()
+            if not (left <= event.x_root <= right and top <= event.y_root <= bottom):
                 return
 
             delta = getattr(event, "delta", 0)
