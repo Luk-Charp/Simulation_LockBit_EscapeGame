@@ -131,13 +131,36 @@ class MailWindow:
         ).pack(side="bottom", anchor="w", padx=22, pady=16)
 
     def _attachment_button(self, parent: tk.Frame, label: str, title: str, content: str) -> None:
-        tk.Button(
-            parent, text="📄  " + label,
-            command=lambda: self._show_attachment(title, content),
+        # Bouton personnalisé : les boutons natifs macOS ignorent parfois
+        # les couleurs demandées et apparaissent blancs.
+        button = tk.Frame(
+            parent, bg=COLORS["card"], padx=12, pady=10,
+            highlightbackground=COLORS["border"], highlightthickness=1,
+            cursor="hand2",
+        )
+        button.pack(side="left", padx=4)
+        caption = tk.Label(
+            button, text="📄  " + label,
             bg=COLORS["card"], fg=COLORS["text"],
-            activebackground=COLORS["card_hover"], activeforeground=COLORS["text"],
-            relief="flat", padx=12, pady=9, cursor="hand2"
-        ).pack(side="left", padx=4)
+            font=("Segoe UI", 9), cursor="hand2",
+        )
+        caption.pack()
+        for widget in (button, caption):
+            widget.bind("<Button-1>", lambda _event: self._show_attachment(title, content))
+            widget.bind(
+                "<Enter>",
+                lambda _event, frame=button, text=caption: (
+                    frame.configure(bg=COLORS["card_hover"]),
+                    text.configure(bg=COLORS["card_hover"]),
+                ),
+            )
+            widget.bind(
+                "<Leave>",
+                lambda _event, frame=button, text=caption: (
+                    frame.configure(bg=COLORS["card"]),
+                    text.configure(bg=COLORS["card"]),
+                ),
+            )
 
     def _show_attachment(self, title: str, content: str) -> None:
         window = tk.Toplevel(self.window)
