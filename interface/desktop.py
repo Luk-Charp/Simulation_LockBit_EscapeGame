@@ -453,10 +453,10 @@ class Desktop:
             tk.Label(window, text=name, bg=COLORS["taskbar"], fg=COLORS["text"], font=("Segoe UI", 16, "bold"), padx=22, pady=18).pack(fill="x")
             tk.Label(window, text="Cette application sera enrichie au fil du développement.", bg=COLORS["background"], fg=COLORS["muted"], font=("Segoe UI", 11), padx=24, pady=24).pack(anchor="w")
 
-    def _build_taskbar(self) -> None:
+    def _build_taskbar(self, parent: tk.Misc | None = None) -> None:
         """Construit une véritable barre des tâches horizontale, inspirée de Linux."""
         taskbar = tk.Frame(
-            self.root, bg=COLORS["taskbar"], height=72,
+            parent or self.desktop_root, bg=COLORS["taskbar"], height=72,
             highlightbackground=COLORS["border"], highlightthickness=1,
         )
         taskbar.pack(side="bottom", fill="x")
@@ -472,7 +472,7 @@ class Desktop:
             "<Button-1>",
             lambda _event: messagebox.showinfo(
                 "Applications", "Les applications disponibles sont accessibles depuis cette barre.",
-                parent=self.root,
+                parent=self.desktop_root,
             ),
         )
         tk.Frame(taskbar, bg=COLORS["border"], width=1).pack(
