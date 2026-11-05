@@ -2,7 +2,7 @@
 
 import tkinter as tk
 
-from interface.desktop import COLORS
+from interface.theme import COLORS
 
 
 class MailWindow:
