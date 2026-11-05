@@ -13,7 +13,7 @@ class MailWindow:
         self.window.title("Messagerie — Poste d'investigation")
         self.window.transient(parent)
         self.window.configure(bg=COLORS["background"])
-        center_window(self.window, 1080, 680)
+        center_window(self.window, 1160, 760)
         self._build_interface()
 
     def _build_interface(self) -> None:
@@ -98,7 +98,7 @@ class MailWindow:
         tk.Label(
             reading, text=message, bg=COLORS["surface"],
             fg=COLORS["text"], font=("Segoe UI", 10),
-            justify="left", anchor="nw", wraplength=590
+            justify="left", anchor="nw", wraplength=440
         ).pack(fill="x", padx=22)
 
         tk.Label(
