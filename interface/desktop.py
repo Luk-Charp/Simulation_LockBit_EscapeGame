@@ -21,16 +21,145 @@ class Desktop:
     """Construit le bureau d'enquête et son parcours à étapes."""
 
     def __init__(self, root: tk.Tk) -> None:
+        self.desktop_root = root
         self.root = root
-        self.root.configure(bg=COLORS["background"])
-        self.root.option_add("*Font", ("Segoe UI", 10))
+        self.desktop_root.title("Debian GNU/Linux")
+        self.desktop_root.configure(bg="#26384f")
+        self.desktop_root.option_add("*Font", ("Segoe UI", 10))
         self.completed_objectives = set()
         self.selected_objective = 0
+        self.objective_rows = []
+        self.investigation_window = None
+        self._build_debian_desktop()
+
+    def _build_debian_desktop(self) -> None:
+        """Affiche le bureau Debian sans ouvrir automatiquement l'enquête."""
+        wallpaper = tk.Canvas(
+            self.desktop_root, bg="#26384f", highlightthickness=0, bd=0
+        )
+        wallpaper.pack(fill="both", expand=True)
+
+        # Motif graphique abstrait inspiré du fond Debian, sans logo officiel.
+        wallpaper.create_oval(
+            0, -260, 900, 640, outline="#344c68", width=2
+        )
+        wallpaper.create_oval(
+            80, -180, 820, 560, outline="#304761", width=2
+        )
+        wallpaper.create_text(
+            0.5, 0.43, text="debian",
+            fill="#e8edf4", font=("Segoe UI", 42, "bold"),
+            anchor="center",
+        )
+        wallpaper.create_text(
+            0.5, 0.50, text="GNU / LINUX",
+            fill="#aebed0", font=("Segoe UI", 10, "bold"),
+            anchor="center",
+        )
+        wallpaper.create_text(
+            0.5, 0.55, text="BUREAU DE TRAVAIL",
+            fill="#aebed0", font=("Segoe UI", 8),
+            anchor="center",
+        )
+        wallpaper.bind("<Configure>", lambda event: self._center_wallpaper(wallpaper, event))
+
+        shortcut = tk.Frame(
+            self.desktop_root, bg="#26384f", width=112, height=112,
+            cursor="hand2",
+        )
+        shortcut.place(x=28, y=28)
+        shortcut.pack_propagate(False)
+        app_icon = tk.Canvas(
+            shortcut, width=58, height=58, bg="#26384f",
+            highlightthickness=0, cursor="hand2",
+        )
+        app_icon.pack(pady=(4, 2))
+        app_icon.create_rectangle(7, 5, 51, 53, fill="#f4f6f8", outline="#d6e0eb", width=2)
+        app_icon.create_rectangle(12, 11, 46, 18, fill="#b21f35", outline="")
+        app_icon.create_text(29, 35, text="FBI", fill="#183b5b", font=("Segoe UI", 13, "bold"))
+        app_name = tk.Label(
+            shortcut, text="Opération Lockdown",
+            bg="#26384f", fg="#ffffff", font=("Segoe UI", 8, "bold"),
+            wraplength=108, justify="center", cursor="hand2",
+        )
+        app_name.pack()
+        for widget in (shortcut, app_icon, app_name):
+            widget.bind("<Double-Button-1>", lambda _event: self._open_investigation())
+            widget.bind("<Button-1>", lambda _event: self._select_desktop_icon(shortcut, True))
+            widget.bind("<Button-3>", lambda _event: self._select_desktop_icon(shortcut, True))
+
+        panel = tk.Frame(self.desktop_root, bg="#172638", height=48)
+        panel.pack(side="bottom", fill="x")
+        panel.pack_propagate(False)
+        menu = tk.Label(
+            panel, text="☰", bg="#172638", fg="#ffffff",
+            font=("Segoe UI Symbol", 20), width=3, cursor="hand2",
+        )
+        menu.pack(side="left", padx=(8, 4))
+        menu.bind("<Button-1>", lambda _event: self._open_investigation())
+        tk.Frame(panel, bg="#40536a", width=1).pack(side="left", fill="y", pady=9)
+        tk.Label(
+            panel, text="Debian", bg="#172638", fg="#e5edf6",
+            font=("Segoe UI", 9, "bold"),
+        ).pack(side="left", padx=12)
+        tk.Label(
+            panel, text="●  Système opérationnel",
+            bg="#172638", fg="#a9c8b4", font=("Segoe UI", 8),
+        ).pack(side="right", padx=18)
+
+    @staticmethod
+    def _center_wallpaper(canvas: tk.Canvas, event) -> None:
+        canvas.delete("center_text")
+        canvas.create_text(
+            event.width // 2, event.height // 2 - 30, text="debian",
+            fill="#e8edf4", font=("Segoe UI", 42, "bold"),
+            tags="center_text",
+        )
+        canvas.create_text(
+            event.width // 2, event.height // 2 + 18, text="GNU / LINUX",
+            fill="#aebed0", font=("Segoe UI", 10, "bold"),
+            tags="center_text",
+        )
+        canvas.create_text(
+            event.width // 2, event.height // 2 + 48, text="BUREAU DE TRAVAIL",
+            fill="#aebed0", font=("Segoe UI", 8),
+            tags="center_text",
+        )
+
+    @staticmethod
+    def _select_desktop_icon(widget: tk.Widget, selected: bool) -> None:
+        widget.configure(highlightbackground="#7ca6d8", highlightthickness=1)
+
+    def _open_investigation(self) -> None:
+        """Ouvre l'application d'enquête dans une fenêtre indépendante."""
+        if self.investigation_window is not None and self.investigation_window.winfo_exists():
+            self.investigation_window.deiconify()
+            self.investigation_window.lift()
+            return
+
+        self.investigation_window = tk.Toplevel(self.desktop_root)
+        self.root = self.investigation_window
+        self.root.title("Opération Lockdown — FBI Cyber Division")
+        self.root.configure(bg=COLORS["background"])
+        self.root.minsize(980, 640)
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        width, height = min(1280, screen_width - 100), min(820, screen_height - 120)
+        x, y = (screen_width - width) // 2, (screen_height - height) // 2
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
+        self.root.option_add("*Font", ("Segoe UI", 10))
         self.objective_rows = []
         self._build_top_bar()
         self._build_workspace()
         self._build_taskbar()
         self._refresh_objectives()
+        self.root.protocol("WM_DELETE_WINDOW", self._close_investigation)
+
+    def _close_investigation(self) -> None:
+        if self.investigation_window is not None:
+            self.investigation_window.destroy()
+        self.investigation_window = None
+        self.root = self.desktop_root
 
     def _build_top_bar(self) -> None:
         top = tk.Frame(self.root, bg=COLORS["taskbar"], height=66)
