@@ -2,7 +2,7 @@
 
 import tkinter as tk
 
-from interface.theme import COLORS
+from interface.theme import COLORS, center_window
 
 
 class MailWindow:
@@ -11,9 +11,9 @@ class MailWindow:
     def __init__(self, parent: tk.Misc) -> None:
         self.window = tk.Toplevel(parent)
         self.window.title("Messagerie — Poste d'investigation")
-        self.window.geometry("1080x680")
-        self.window.minsize(850, 560)
+        self.window.transient(parent)
         self.window.configure(bg=COLORS["background"])
+        center_window(self.window, 1080, 680)
         self._build_interface()
 
     def _build_interface(self) -> None:
