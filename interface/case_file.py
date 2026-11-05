@@ -14,7 +14,7 @@ class CaseFileWindow:
         self.window.title("Dossier d'enquête — Opération Lockdown")
         self.window.transient(parent)
         self.window.configure(bg=COLORS["background"])
-        center_window(self.window, 1100, 760)
+        center_window(self.window, 1100, 800)
         self._configure_style()
         self._build_interface()
 
@@ -32,6 +32,22 @@ class CaseFileWindow:
             foreground=COLORS["muted"],
             padding=(16, 10),
             borderwidth=0,
+            focuscolor=COLORS["surface"],
+            lightcolor=COLORS["surface"],
+            darkcolor=COLORS["surface"],
+        )
+        # Retire l'élément de focus natif qui laisse un cadre clair
+        # autour de l'onglet sélectionné sur macOS.
+        style.layout(
+            "Case.TNotebook.Tab",
+            [("Notebook.tab", {
+                "sticky": "nswe",
+                "children": [("Notebook.padding", {
+                    "side": "top",
+                    "sticky": "nswe",
+                    "children": [("Notebook.label", {"side": "top", "sticky": ""})],
+                })],
+            })],
         )
         style.map(
             "Case.TNotebook.Tab",
@@ -80,7 +96,7 @@ class CaseFileWindow:
             font=("Segoe UI", 9),
         ).pack(anchor="w")
 
-        notebook = ttk.Notebook(wrapper, style="Case.TNotebook")
+        notebook = ttk.Notebook(wrapper, style="Case.TNotebook", takefocus=False)
         notebook.pack(fill="both", expand=True)
 
         overview = tk.Frame(notebook, bg=COLORS["card"])
