@@ -127,27 +127,44 @@ class CaseFileWindow:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        # Molette souris et trackpad : le défilement ne s'active que sur cet onglet.
+        # Tk reçoit les gestes du trackpad macOS sous forme de petits deltas.
+        # bind_all capte aussi les événements lorsque le pointeur est sur un Label
+        # ou un Frame contenu dans le Canvas.
+        wheel_remainder = {"value": 0.0}
+
         def on_mousewheel(event):
-            if getattr(event, "delta", 0):
-                canvas.yview_scroll(int(-event.delta / 120) or (-1 if event.delta > 0 else 1), "units")
+            widget = event.widget
+            inside_this_canvas = False
+            while widget is not None:
+                if widget is canvas:
+                    inside_this_canvas = True
+                    break
+                widget = getattr(widget, "master", None)
+
+            if not inside_this_canvas:
+                return
+
+            delta = getattr(event, "delta", 0)
+            if delta:
+                if abs(delta) >= 120:
+                    units = int(-delta / 120 * 3)
+                else:
+                    wheel_remainder["value"] += -delta
+                    units = int(wheel_remainder["value"] / 2)
+                    wheel_remainder["value"] -= units * 2
+                if units:
+                    canvas.yview_scroll(units, "units")
             elif getattr(event, "num", None) == 4:
                 canvas.yview_scroll(-1, "units")
             elif getattr(event, "num", None) == 5:
                 canvas.yview_scroll(1, "units")
+            return "break"
 
-        def bind_wheel(_event=None):
-            canvas.bind_all("<MouseWheel>", on_mousewheel)
-            canvas.bind_all("<Button-4>", on_mousewheel)
-            canvas.bind_all("<Button-5>", on_mousewheel)
-
-        def unbind_wheel(_event=None):
-            canvas.unbind_all("<MouseWheel>")
-            canvas.unbind_all("<Button-4>")
-            canvas.unbind_all("<Button-5>")
-
-        canvas.bind("<Enter>", bind_wheel)
-        canvas.bind("<Leave>", unbind_wheel)
+        # Le binding global reste actif tant que la fenêtre du dossier existe.
+        # Le contrôle du widget cible empêche de faire défiler les autres fenêtres.
+        canvas.bind_all("<MouseWheel>", on_mousewheel, add="+")
+        canvas.bind_all("<Button-4>", on_mousewheel, add="+")
+        canvas.bind_all("<Button-5>", on_mousewheel, add="+")
         return tab, content
 
     def _section_title(self, parent: tk.Frame, title: str, subtitle: str) -> None:
