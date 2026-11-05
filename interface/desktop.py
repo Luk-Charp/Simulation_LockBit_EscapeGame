@@ -46,21 +46,6 @@ class Desktop:
         wallpaper.create_oval(
             80, -180, 820, 560, outline="#304761", width=2
         )
-        wallpaper.create_text(
-            0.5, 0.43, text="debian",
-            fill="#e8edf4", font=("Segoe UI", 42, "bold"),
-            anchor="center",
-        )
-        wallpaper.create_text(
-            0.5, 0.50, text="GNU / LINUX",
-            fill="#aebed0", font=("Segoe UI", 10, "bold"),
-            anchor="center",
-        )
-        wallpaper.create_text(
-            0.5, 0.55, text="BUREAU DE TRAVAIL",
-            fill="#aebed0", font=("Segoe UI", 8),
-            anchor="center",
-        )
         wallpaper.bind("<Configure>", lambda event: self._center_wallpaper(wallpaper, event))
 
         shortcut = tk.Frame(
