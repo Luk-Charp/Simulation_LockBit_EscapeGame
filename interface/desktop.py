@@ -91,20 +91,15 @@ class Desktop:
         return canvas
 
     def _build_debian_desktop(self) -> None:
-        """Affiche le bureau Debian sans ouvrir automatiquement l'enquête."""
+        """Construit un bureau Linux sombre, lisible et organisé comme un poste de travail."""
         wallpaper = tk.Canvas(
-            self.desktop_root, bg="#26384f", highlightthickness=0, bd=0
+            self.desktop_root, bg="#172b42", highlightthickness=0, bd=0,
         )
         wallpaper.pack(fill="both", expand=True)
-
-        # Motif graphique abstrait inspiré du fond Debian, sans logo officiel.
-        wallpaper.create_oval(
-            0, -260, 900, 640, outline="#344c68", width=2
+        wallpaper.bind(
+            "<Configure>",
+            lambda event: self._center_wallpaper(wallpaper, event),
         )
-        wallpaper.create_oval(
-            80, -180, 820, 560, outline="#304761", width=2
-        )
-        wallpaper.bind("<Configure>", lambda event: self._center_wallpaper(wallpaper, event))
 
         desktop_apps = [
             ("Opération Lockdown", "investigation"),
@@ -117,26 +112,40 @@ class Desktop:
         for index, (title, app_id) in enumerate(desktop_apps):
             column, row = index // 3, index % 3
             shortcut = tk.Frame(
-                self.desktop_root, bg="#26384f", width=116, height=104,
-                cursor="hand2",
+                self.desktop_root, bg="#263d57", width=142, height=112,
+                cursor="hand2", highlightthickness=1,
+                highlightbackground="#405a76",
             )
-            shortcut.place(x=22 + column * 128, y=22 + row * 116)
+            shortcut.place(x=24 + column * 154, y=52 + row * 126)
             shortcut.pack_propagate(False)
-            icon = self._draw_app_icon(shortcut, app_id, 56, "#26384f")
-            icon.pack(pady=(2, 3))
+
+            icon = self._draw_app_icon(shortcut, app_id, 48, "#263d57")
+            icon.pack(pady=(10, 5))
             label = tk.Label(
-                shortcut, text=title, bg="#26384f", fg="#ffffff",
-                font=("Segoe UI", 8), wraplength=110, justify="center",
-                cursor="hand2", highlightthickness=2,
-                highlightbackground="#26384f", takefocus=1,
+                shortcut, text=title, bg="#263d57", fg="#f4f7fb",
+                font=("Segoe UI", 9, "bold"), wraplength=128,
+                justify="center", cursor="hand2",
             )
-            label.pack()
-            shortcut.bind("<Enter>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, True))
-            shortcut.bind("<Leave>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, False))
-            label.bind("<FocusIn>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, True))
-            label.bind("<FocusOut>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, False))
-            label.bind("<Return>", lambda _event, selected=app_id: self._open_application(selected))
-            for widget in (shortcut, icon, label):
+            label.pack(fill="x", padx=5)
+
+            widgets = (shortcut, icon, label)
+            shortcut.bind(
+                "<Enter>",
+                lambda _event, elements=widgets: self._set_shortcut_hover(elements, True),
+            )
+            shortcut.bind(
+                "<Leave>",
+                lambda _event, elements=widgets: self._set_shortcut_hover(elements, False),
+            )
+            label.bind(
+                "<Enter>",
+                lambda _event, elements=widgets: self._set_shortcut_hover(elements, True),
+            )
+            label.bind(
+                "<Leave>",
+                lambda _event, elements=widgets: self._set_shortcut_hover(elements, False),
+            )
+            for widget in widgets:
                 widget.bind(
                     "<Double-Button-1>",
                     lambda _event, selected=app_id: self._open_application(selected),
@@ -147,24 +156,90 @@ class Desktop:
                 )
 
         self._build_taskbar(self.desktop_root)
+
     @staticmethod
     def _center_wallpaper(canvas: tk.Canvas, event) -> None:
-        canvas.delete("center_text")
+        """Dessine un fond structuré avec une zone d'accueil discrète."""
+        canvas.delete("wallpaper")
+        width, height = event.width, event.height
+
+        # Bandes de fond pour donner de la profondeur sans image externe.
+        canvas.create_rectangle(
+            0, 0, width, height, fill="#172b42", outline="", tags="wallpaper",
+        )
+        canvas.create_polygon(
+            width * 0.42, 0, width, 0, width, height, width * 0.70, height,
+            fill="#1c344e", outline="", tags="wallpaper",
+        )
+        canvas.create_oval(
+            width * 0.48, -height * 0.72, width * 1.22, height * 0.95,
+            outline="#294763", width=2, tags="wallpaper",
+        )
+        canvas.create_oval(
+            width * 0.56, -height * 0.60, width * 1.14, height * 0.80,
+            outline="#233f5b", width=2, tags="wallpaper",
+        )
+        canvas.create_line(
+            width * 0.66, 0, width * 0.34, height,
+            fill="#203a55", width=2, tags="wallpaper",
+        )
+
+        # En-tête système en haut à gauche.
         canvas.create_text(
-            event.width // 2, event.height // 2 - 30, text="debian",
-            fill="#e8edf4", font=("Segoe UI", 42, "bold"),
-            tags="center_text",
+            26, 20, text="DEBIAN  /  CYBER WORKSTATION",
+            anchor="nw", fill="#dce7f2",
+            font=("Segoe UI", 9, "bold"), tags="wallpaper",
         )
         canvas.create_text(
-            event.width // 2, event.height // 2 + 18, text="GNU / LINUX",
-            fill="#aebed0", font=("Segoe UI", 10, "bold"),
-            tags="center_text",
+            26, 40, text="ENVIRONNEMENT D'INVESTIGATION NUMÉRIQUE",
+            anchor="nw", fill="#8fa6bd",
+            font=("Segoe UI", 7), tags="wallpaper",
+        )
+
+        # Carte d'accueil à droite : le texte narratif reste strictement identique.
+        panel_x = width * 0.48
+        panel_y = height * 0.40
+        canvas.create_rectangle(
+            panel_x, panel_y, width - 42, panel_y + 142,
+            fill="#203952", outline="#385570", width=1,
+            tags="wallpaper",
+        )
+        canvas.create_rectangle(
+            panel_x, panel_y, panel_x + 4, panel_y + 142,
+            fill="#d6b15e", outline="", tags="wallpaper",
         )
         canvas.create_text(
-            event.width // 2, event.height // 2 + 48, text="BUREAU DE TRAVAIL",
-            fill="#aebed0", font=("Segoe UI", 8),
-            tags="center_text",
+            panel_x + 24, panel_y + 22,
+            text="POSTE DE TRAVAIL SÉCURISÉ",
+            anchor="nw", fill="#d6b15e",
+            font=("Segoe UI", 8, "bold"), tags="wallpaper",
         )
+        canvas.create_text(
+            panel_x + 24, panel_y + 48,
+            text="Opération Lockdown",
+            anchor="nw", fill="#f4f7fb",
+            font=("Segoe UI", 23, "bold"), tags="wallpaper",
+        )
+        canvas.create_text(
+            panel_x + 24, panel_y + 88,
+            text="HexaTech Industries  •  Affaire #LK-2026-1104",
+            anchor="nw", fill="#b8c8d8",
+            font=("Segoe UI", 9), tags="wallpaper",
+        )
+        canvas.create_text(
+            panel_x + 24, panel_y + 116,
+            text="Double-cliquez sur une application pour commencer.",
+            anchor="nw", fill="#8fa6bd",
+            font=("Segoe UI", 8), tags="wallpaper",
+        )
+
+    @staticmethod
+    def _set_shortcut_hover(widgets: tuple, hovered: bool) -> None:
+        background = "#36536f" if hovered else "#263d57"
+        border = "#8eb4d8" if hovered else "#405a76"
+        widgets[0].configure(bg=background, highlightbackground=border)
+        widgets[1].configure(bg=background)
+        widgets[2].configure(bg=background)
 
     @staticmethod
     def _select_desktop_icon(widget: tk.Widget, selected: bool) -> None:
