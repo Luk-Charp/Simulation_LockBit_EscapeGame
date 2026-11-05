@@ -23,12 +23,12 @@ class MailWindow:
         header.pack_propagate(False)
         tk.Label(
             header, text="✉  MESSAGERIE",
-            bg=COLORS["taskbar"], fg=COLORS["text"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark"],
             font=("Segoe UI", 14, "bold"),
         ).pack(side="left", padx=20)
         tk.Label(
             header, text="Boîte de réception  •  Compte sécurisé",
-            bg=COLORS["taskbar"], fg=COLORS["muted"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark_muted"],
             font=("Segoe UI", 9),
         ).pack(side="right", padx=20)
 
@@ -191,6 +191,7 @@ class MailWindow:
             content_frame, wrap="word", yscrollcommand=scrollbar.set,
             bg=COLORS["surface"], fg=COLORS["text"],
             insertbackground=COLORS["text"], relief="flat",
+            highlightthickness=0, borderwidth=0, takefocus=0,
             padx=2, pady=4, font=("Segoe UI", 10),
             spacing1=1, spacing3=8, state="normal",
         )
@@ -288,7 +289,8 @@ class MailWindow:
         text_area = tk.Text(
             window, wrap="word", bg=COLORS["surface"],
             fg=COLORS["text"], insertbackground=COLORS["text"],
-            relief="flat", padx=14, pady=14, font=("Consolas", 10),
+            relief="flat", highlightthickness=0, borderwidth=0, takefocus=0,
+            padx=14, pady=14, font=("Consolas", 10),
         )
         text_area.pack(fill="both", expand=True, padx=18, pady=(0, 18))
         text_area.insert("1.0", content)
