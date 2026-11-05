@@ -16,7 +16,12 @@ class CaseFileWindow:
         self.window.configure(bg=COLORS["background"])
         center_window(self.window, 1100, 800)
         self._configure_style()
+        self._scroll_canvases = []
         self._build_interface()
+        self.window.bind_all("<MouseWheel>", self._on_trackpad_scroll, add="+")
+        self.window.bind_all("<Button-4>", self._on_trackpad_scroll, add="+")
+        self.window.bind_all("<Button-5>", self._on_trackpad_scroll, add="+")
+        self.window.bind("<Destroy>", self._cleanup_scroll_bindings, add="+")
 
     def _configure_style(self) -> None:
         style = ttk.Style(self.window)
@@ -127,43 +132,47 @@ class CaseFileWindow:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        # Tk reçoit les gestes du trackpad macOS sous forme de petits deltas.
-        # bind_all capte aussi les événements lorsque le pointeur est sur un Label
-        # ou un Frame contenu dans le Canvas.
-        wheel_remainder = {"value": 0.0}
+        self._scroll_canvases.append(canvas)
+        return tab, content
 
-        def on_mousewheel(event):
-            # Les widgets intégrés au Canvas ne sont pas ses enfants Tk directs.
-            # On vérifie donc la position réelle du pointeur à l'écran.
-            left = canvas.winfo_rootx()
-            top = canvas.winfo_rooty()
-            right = left + canvas.winfo_width()
-            bottom = top + canvas.winfo_height()
-            if not (left <= event.x_root <= right and top <= event.y_root <= bottom):
-                return
+    def _on_trackpad_scroll(self, event):
+        """Fait défiler l'onglet visible sous le pointeur, y compris avec le trackpad Mac."""
+        try:
+            pointer_x = self.window.winfo_pointerx()
+            pointer_y = self.window.winfo_pointery()
+        except tk.TclError:
+            return
+
+        for canvas in self._scroll_canvases:
+            if not canvas.winfo_exists() or not canvas.winfo_ismapped():
+                continue
+            left, top = canvas.winfo_rootx(), canvas.winfo_rooty()
+            right, bottom = left + canvas.winfo_width(), top + canvas.winfo_height()
+            if not (left <= pointer_x <= right and top <= pointer_y <= bottom):
+                continue
 
             delta = getattr(event, "delta", 0)
             if delta:
-                if abs(delta) >= 120:
-                    units = int(-delta / 120 * 3)
-                else:
-                    wheel_remainder["value"] += -delta
-                    units = int(wheel_remainder["value"] / 2)
-                    wheel_remainder["value"] -= units * 2
-                if units:
-                    canvas.yview_scroll(units, "units")
+                # macOS transmet souvent des deltas très faibles (±1 ou ±2).
+                # Windows transmet généralement des multiples de 120.
+                units = max(1, int(abs(delta) / 120 * 3)) if abs(delta) >= 120 else max(1, int(abs(delta)))
+                canvas.yview_scroll(-units if delta > 0 else units, "units")
             elif getattr(event, "num", None) == 4:
                 canvas.yview_scroll(-1, "units")
             elif getattr(event, "num", None) == 5:
                 canvas.yview_scroll(1, "units")
             return "break"
+        return None
 
-        # Le binding global reste actif tant que la fenêtre du dossier existe.
-        # Le contrôle du widget cible empêche de faire défiler les autres fenêtres.
-        canvas.bind_all("<MouseWheel>", on_mousewheel, add="+")
-        canvas.bind_all("<Button-4>", on_mousewheel, add="+")
-        canvas.bind_all("<Button-5>", on_mousewheel, add="+")
-        return tab, content
+    def _cleanup_scroll_bindings(self, event) -> None:
+        """Retire les bindings globaux lorsque la fenêtre du dossier est détruite."""
+        if event.widget is not self.window:
+            return
+        for sequence in ("<MouseWheel>", "<Button-4>", "<Button-5>"):
+            try:
+                self.window.unbind_all(sequence)
+            except tk.TclError:
+                pass
 
     def _section_title(self, parent: tk.Frame, title: str, subtitle: str) -> None:
         tk.Label(
