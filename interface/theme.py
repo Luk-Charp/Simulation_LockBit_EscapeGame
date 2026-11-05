@@ -1,19 +1,18 @@
-"""Palette partagée par les différentes fenêtres de l'application."""
+"""Palette visuelle partagée par les fenêtres de l'application."""
 
 COLORS = {
-    "background": "#111827",
-    "surface": "#172235",
-    "card": "#1b2a40",
-    "card_hover": "#223650",
-    "text": "#edf2f7",
-    "muted": "#9eacbf",
-    "accent": "#55b7d9",
-    "accent_dark": "#244c63",
-    "green": "#65c69a",
-    "border": "#2c4058",
-    "taskbar": "#0c1421",
+    "background": "#0b1220",
+    "surface": "#111c2e",
+    "card": "#16243a",
+    "card_hover": "#1c304b",
+    "text": "#f3f7fc",
+    "muted": "#91a2b8",
+    "accent": "#63c9e8",
+    "accent_dark": "#173b50",
+    "green": "#69d6a4",
+    "border": "#263a54",
+    "taskbar": "#080f1b",
 }
-
 
 
 def center_window(window, preferred_width: int, preferred_height: int) -> None:
