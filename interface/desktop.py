@@ -3,6 +3,8 @@
 import tkinter as tk
 from tkinter import messagebox
 
+from interface.mail import MailWindow
+
 
 # Palette commune de l'interface.
 COLORS = {
@@ -215,6 +217,10 @@ class Desktop:
             "map": "Carte",
         }
         app_name = app_names.get(app_id, "Application")
+
+        if app_id == "mail":
+            MailWindow(self.root)
+            return
 
         messagebox.showinfo(
             app_name,
