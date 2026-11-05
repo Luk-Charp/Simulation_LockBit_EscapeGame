@@ -52,6 +52,7 @@ class VoicemailWindow:
             / "assets" / "audio" / "Sophie_Martin.mp3"
         )
         self.is_playing = False
+        self.is_paused = False
         self._build_ui()
         self._load_audio()
         self.window.grab_set()
@@ -102,14 +103,21 @@ class VoicemailWindow:
         self.status_label.pack(anchor="w")
         controls = tk.Frame(player, bg=COLORS["card"])
         controls.pack(fill="x", pady=(9, 0))
-        self.play_button = tk.Button(
-            controls, text="▶  Écouter le message", command=self.toggle_playback,
-            bg=COLORS["accent_dark"], fg=COLORS["text"],
-            activebackground=COLORS["accent"], activeforeground=COLORS["text"],
-            relief="flat", padx=15, pady=8, cursor="hand2",
-            font=("Segoe UI", 10, "bold"),
+        # Frame + Label permettent de contrôler l'apparence sur macOS.
+        self.play_button = tk.Frame(
+            controls, bg=COLORS["accent_dark"], padx=16, pady=9, cursor="hand2"
         )
         self.play_button.pack(side="left")
+        self.play_button_label = tk.Label(
+            self.play_button, text="▶  Écouter le message",
+            bg=COLORS["accent_dark"], fg=COLORS["text"],
+            font=("Segoe UI", 10, "bold"), cursor="hand2",
+        )
+        self.play_button_label.pack()
+        for widget in (self.play_button, self.play_button_label):
+            widget.bind("<Button-1>", lambda _event: self.toggle_playback())
+            widget.bind("<Enter>", lambda _event: self._set_play_button_color(COLORS["accent"]))
+            widget.bind("<Leave>", lambda _event: self._set_play_button_color(COLORS["accent_dark"]))
         self.audio_info = tk.Label(
             controls, text="Durée : environ 1 min 33",
             bg=COLORS["card"], fg=COLORS["muted"],
@@ -156,7 +164,7 @@ class VoicemailWindow:
     def _load_audio(self) -> None:
         if not self.audio_path.exists():
             self.status_label.configure(text="FICHIER AUDIO INTROUVABLE")
-            self.play_button.configure(state="disabled")
+            self._set_play_button_enabled(False)
             self.audio_info.configure(
                 text="Placez Sophie_Martin.mp3 dans assets/audio/"
             )
@@ -176,23 +184,47 @@ class VoicemailWindow:
             self.play_button.configure(state="disabled")
             self.audio_info.configure(text=str(error)[:90])
 
+    def _set_play_button_color(self, color: str) -> None:
+        self.play_button.configure(bg=color)
+        self.play_button_label.configure(bg=color)
+
+    def _set_play_button_enabled(self, enabled: bool) -> None:
+        self.play_button.configure(cursor="hand2" if enabled else "arrow")
+        self.play_button_label.configure(
+            fg=COLORS["text"] if enabled else COLORS["muted"],
+            cursor="hand2" if enabled else "arrow",
+        )
+        if not enabled:
+            for widget in (self.play_button, self.play_button_label):
+                widget.unbind("<Button-1>")
+                widget.unbind("<Enter>")
+                widget.unbind("<Leave>")
+
+    def _set_play_button_text(self, text: str) -> None:
+        self.play_button_label.configure(text=text)
+
     def toggle_playback(self) -> None:
         if pygame is None:
             return
         try:
-            if pygame.mixer.music.get_busy():
+            if self.is_playing:
                 pygame.mixer.music.pause()
                 self.is_playing = False
-                self.play_button.configure(text="▶  Reprendre")
+                self.is_paused = True
+                self._set_play_button_text("▶  Reprendre")
                 self.status_label.configure(text="LECTURE EN PAUSE")
-            elif self.is_playing:
+            elif self.is_paused:
                 pygame.mixer.music.unpause()
-                self.play_button.configure(text="Ⅱ  Mettre en pause")
+                self.is_playing = True
+                self.is_paused = False
+                self._set_play_button_text("Ⅱ  Mettre en pause")
                 self.status_label.configure(text="LECTURE EN COURS")
+                self._watch_playback()
             else:
                 pygame.mixer.music.play()
                 self.is_playing = True
-                self.play_button.configure(text="Ⅱ  Mettre en pause")
+                self.is_paused = False
+                self._set_play_button_text("Ⅱ  Mettre en pause")
                 self.status_label.configure(text="LECTURE EN COURS")
                 self._watch_playback()
         except Exception as error:
@@ -201,9 +233,13 @@ class VoicemailWindow:
     def _watch_playback(self) -> None:
         if not self.window.winfo_exists():
             return
+        if self.is_paused:
+            self.window.after(400, self._watch_playback)
+            return
         if pygame is not None and not pygame.mixer.music.get_busy():
             self.is_playing = False
-            self.play_button.configure(text="▶  Réécouter le message")
+            self.is_paused = False
+            self._set_play_button_text("▶  Réécouter le message")
             self.status_label.configure(text="MESSAGE TERMINÉ")
             return
         self.window.after(400, self._watch_playback)
