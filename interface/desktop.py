@@ -127,9 +127,15 @@ class Desktop:
             label = tk.Label(
                 shortcut, text=title, bg="#26384f", fg="#ffffff",
                 font=("Segoe UI", 8), wraplength=110, justify="center",
-                cursor="hand2",
+                cursor="hand2", highlightthickness=2,
+                highlightbackground="#26384f", takefocus=1,
             )
             label.pack()
+            shortcut.bind("<Enter>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, True))
+            shortcut.bind("<Leave>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, False))
+            label.bind("<FocusIn>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, True))
+            label.bind("<FocusOut>", lambda _event, elements=(shortcut, icon, label): self._set_shortcut_hover(elements, False))
+            label.bind("<Return>", lambda _event, selected=app_id: self._open_application(selected))
             for widget in (shortcut, icon, label):
                 widget.bind(
                     "<Double-Button-1>",
@@ -162,7 +168,14 @@ class Desktop:
 
     @staticmethod
     def _select_desktop_icon(widget: tk.Widget, selected: bool) -> None:
-        widget.configure(highlightbackground="#7ca6d8", highlightthickness=1)
+        widget.configure(highlightbackground="#7ca6d8", highlightthickness=2)
+
+    @staticmethod
+    def _set_shortcut_hover(widgets: tuple, hovered: bool) -> None:
+        background = "#344d68" if hovered else "#26384f"
+        widgets[0].configure(bg=background, highlightbackground="#7ca6d8" if hovered else "#26384f")
+        widgets[1].configure(bg=background)
+        widgets[2].configure(bg=background)
 
     def _open_investigation(self) -> None:
         """Ouvre l'application d'enquête dans une fenêtre indépendante."""
@@ -606,7 +619,7 @@ class Desktop:
         launcher.bind(
             "<Button-1>",
             lambda _event: messagebox.showinfo(
-                "Applications", "Les applications disponibles sont accessibles depuis cette barre.",
+                "Applications", "Double-cliquez une icône du bureau pour ouvrir une application.",
                 parent=self.desktop_root,
             ),
         )
