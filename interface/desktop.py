@@ -81,7 +81,7 @@ class Desktop:
             font=("Segoe UI", 9, "bold"),
         ).pack(anchor="w")
         tk.Label(
-            intro, text="Bienvenue, agent.",
+            intro, text="Bonjour, agents.",
             bg=COLORS["background"], fg=COLORS["text"],
             font=("Segoe UI", 30, "bold"),
         ).pack(anchor="w", pady=(10, 7))
