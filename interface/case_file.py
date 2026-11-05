@@ -14,7 +14,7 @@ class CaseFileWindow:
         self.window.title("Dossier d'enquête — Opération Lockdown")
         self.window.transient(parent)
         self.window.configure(bg=COLORS["background"])
-        center_window(self.window, 1000, 660)
+        center_window(self.window, 1100, 760)
         self._configure_style()
         self._build_interface()
 
