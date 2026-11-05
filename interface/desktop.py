@@ -5,7 +5,7 @@ from tkinter import messagebox
 
 from interface.mail import MailWindow
 from interface.case_file import CaseFileWindow
-from interface.theme import COLORS
+from interface.theme import COLORS, center_window
 
 
 OBJECTIVES = (
@@ -216,7 +216,7 @@ class Desktop:
         identity.pack(side="left")
         tk.Label(
             identity, text="FEDERAL BUREAU OF INVESTIGATION",
-            bg=COLORS["taskbar"], fg=COLORS["text"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark"],
             font=("Segoe UI", 9, "bold"),
         ).pack(anchor="w")
         tk.Label(
@@ -244,8 +244,33 @@ class Desktop:
 
         self._build_objective_sidebar(workspace)
 
-        content = tk.Frame(workspace, bg=COLORS["background"])
-        content.pack(side="left", fill="both", expand=True, padx=42, pady=34)
+        content_shell = tk.Frame(workspace, bg=COLORS["background"])
+        content_shell.pack(side="left", fill="both", expand=True)
+        content_canvas = tk.Canvas(
+            content_shell, bg=COLORS["background"], highlightthickness=0, bd=0,
+        )
+        content_scrollbar = tk.Scrollbar(
+            content_shell, orient="vertical", command=content_canvas.yview,
+        )
+        content_canvas.configure(yscrollcommand=content_scrollbar.set)
+        content_canvas.pack(side="left", fill="both", expand=True)
+        content_scrollbar.pack(side="right", fill="y")
+        content = tk.Frame(content_canvas, bg=COLORS["background"], padx=42, pady=34)
+        content_window = content_canvas.create_window(
+            (0, 0), window=content, anchor="nw",
+        )
+        content.bind(
+            "<Configure>",
+            lambda _event: content_canvas.configure(
+                scrollregion=content_canvas.bbox("all")
+            ),
+        )
+        content_canvas.bind(
+            "<Configure>",
+            lambda event: content_canvas.itemconfigure(
+                content_window, width=event.width
+            ),
+        )
 
         intro = tk.Frame(content, bg=COLORS["background"])
         intro.pack(fill="x", pady=(0, 30))
@@ -534,9 +559,34 @@ class Desktop:
             window = tk.Toplevel(self.desktop_root)
             window.title(name)
             window.configure(bg=COLORS["background"])
-            window.geometry("760x520")
-            tk.Label(window, text=name, bg=COLORS["taskbar"], fg=COLORS["text"], font=("Segoe UI", 16, "bold"), padx=22, pady=18).pack(fill="x")
-            tk.Label(window, text="Cette application sera enrichie au fil du développement.", bg=COLORS["background"], fg=COLORS["muted"], font=("Segoe UI", 11), padx=24, pady=24).pack(anchor="w")
+            center_window(window, 760, 520)
+            header = tk.Frame(window, bg=COLORS["taskbar"], padx=24, pady=18)
+            header.pack(fill="x")
+            tk.Label(
+                header, text="BUREAU D'INVESTIGATION  /  OUTIL",
+                bg=COLORS["taskbar"], fg=COLORS["gold"],
+                font=("Segoe UI", 8, "bold"),
+            ).pack(anchor="w")
+            tk.Label(
+                header, text=name, bg=COLORS["taskbar"], fg=COLORS["on_dark"],
+                font=("Segoe UI", 18, "bold"),
+            ).pack(anchor="w", pady=(5, 0))
+            panel = tk.Frame(
+                window, bg=COLORS["surface"], padx=24, pady=22,
+                highlightbackground=COLORS["border"], highlightthickness=1,
+            )
+            panel.pack(fill="both", expand=True, padx=24, pady=24)
+            tk.Label(
+                panel, text="Application en préparation",
+                bg=COLORS["surface"], fg=COLORS["accent"],
+                font=("Segoe UI", 11, "bold"),
+            ).pack(anchor="w")
+            tk.Label(
+                panel,
+                text="Cette application sera enrichie au fil du développement.",
+                bg=COLORS["surface"], fg=COLORS["muted"],
+                font=("Segoe UI", 10), wraplength=560, justify="left",
+            ).pack(anchor="w", pady=(8, 0))
 
     def _build_taskbar(self, parent: tk.Misc | None = None) -> None:
         """Construit une véritable barre des tâches horizontale, inspirée de Linux."""
