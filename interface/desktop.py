@@ -41,15 +41,23 @@ class Desktop:
         brand.pack(side="left", padx=30)
         tk.Label(
             brand, text="FBI", bg=COLORS["taskbar"], fg=COLORS["text"],
-            font=("Segoe UI", 19, "bold"),
+            font=("Georgia", 21, "bold"),
         ).pack(side="left")
-        tk.Frame(brand, bg=COLORS["accent"], width=2, height=28).pack(
-            side="left", padx=14, pady=18
+        tk.Frame(brand, bg=COLORS["gold"], width=3, height=34).pack(
+            side="left", padx=14, pady=16
         )
+        identity = tk.Frame(brand, bg=COLORS["taskbar"])
+        identity.pack(side="left")
         tk.Label(
-            brand, text="CYBER DIVISION", bg=COLORS["taskbar"],
-            fg=COLORS["muted"], font=("Segoe UI", 9, "bold"),
-        ).pack(side="left")
+            identity, text="FEDERAL BUREAU OF INVESTIGATION",
+            bg=COLORS["taskbar"], fg=COLORS["text"],
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w")
+        tk.Label(
+            identity, text="CYBER DIVISION  •  DIGITAL INVESTIGATIONS",
+            bg=COLORS["taskbar"], fg=COLORS["gold"],
+            font=("Segoe UI", 7, "bold"),
+        ).pack(anchor="w", pady=(2, 0))
 
         right = tk.Frame(top, bg=COLORS["taskbar"])
         right.pack(side="right", padx=30)
@@ -60,7 +68,7 @@ class Desktop:
         ).pack(side="left", padx=(0, 18))
         tk.Label(
             right, text="OPÉRATION LOCKDOWN",
-            bg=COLORS["taskbar"], fg=COLORS["text"],
+            bg=COLORS["taskbar"], fg=COLORS["gold"],
             font=("Segoe UI", 9, "bold"),
         ).pack(side="left")
 
@@ -76,7 +84,7 @@ class Desktop:
         intro = tk.Frame(content, bg=COLORS["background"])
         intro.pack(fill="x", pady=(0, 30))
         tk.Label(
-            intro, text="CENTRE OPÉRATIONNEL  /  04 NOVEMBRE 2026",
+            intro, text="FEDERAL BUREAU OF INVESTIGATION     /     CYBER DIVISION",
             bg=COLORS["background"], fg=COLORS["accent"],
             font=("Segoe UI", 9, "bold"),
         ).pack(anchor="w")
