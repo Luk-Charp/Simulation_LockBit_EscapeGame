@@ -57,12 +57,12 @@ class CaseFileWindow:
         header.pack_propagate(False)
         tk.Label(
             header, text="DOSSIER D'ENQUÊTE",
-            bg=COLORS["taskbar"], fg=COLORS["text"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark"],
             font=("Segoe UI", 14, "bold"),
         ).pack(side="left", padx=22)
         tk.Label(
             header, text="AFFAIRE #LK-2026-1104",
-            bg=COLORS["taskbar"], fg=COLORS["muted"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark_muted"],
             font=("Segoe UI", 9, "bold"),
         ).pack(side="right", padx=22)
 
@@ -204,11 +204,11 @@ class CaseFileWindow:
         note = tk.Frame(parent, bg=COLORS["accent_dark"], padx=14, pady=12)
         note.pack(fill="x", padx=22, pady=(16, 12))
         tk.Label(
-            note, text=title, bg=COLORS["accent_dark"], fg=COLORS["accent"],
+            note, text=title, bg=COLORS["accent_dark"], fg=COLORS["on_dark"],
             font=("Segoe UI", 9, "bold"),
         ).pack(anchor="w")
         tk.Label(
-            note, text=text, bg=COLORS["accent_dark"], fg=COLORS["text"],
+            note, text=text, bg=COLORS["accent_dark"], fg=COLORS["on_dark_muted"],
             font=("Segoe UI", 9), wraplength=850, justify="left",
         ).pack(anchor="w", pady=(5, 0))
 
