@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from interface.mail import MailWindow
+from interface.case_file import CaseFileWindow
 
 from interface.theme import COLORS
 
@@ -199,6 +200,9 @@ class Desktop:
         app_name = app_names.get(app_id, "Application")
         if app_id == "mail":
             MailWindow(self.root)
+            return
+        if app_id == "case":
+            CaseFileWindow(self.root)
             return
 
         messagebox.showinfo(
