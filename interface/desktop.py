@@ -384,7 +384,7 @@ class Desktop:
         self.objective_description.pack(anchor="w", padx=20, pady=(18, 12))
 
         self.complete_button = tk.Label(
-            sidebar, text="VALIDER CETTE ÉTAPE",
+            sidebar, text="PASSER LE CHECKPOINT",
             bg=COLORS["accent_dark"], fg=COLORS["button_text"],
             font=("Segoe UI", 8, "bold"), padx=10, pady=12,
             cursor="hand2",
@@ -411,13 +411,27 @@ class Desktop:
         index = self.selected_objective
         if index in self.completed_objectives or index != len(self.completed_objectives):
             return
-        confirmed = messagebox.askyesno(
-            "Valider l'objectif",
-            f"Avez-vous terminé l'objectif « {OBJECTIVES[index][1]} » ?\n\n"
-            "La validation débloquera l'étape suivante.",
-            parent=self.root,
-        )
-        if not confirmed:
+
+        # Le premier checkpoint est rédigé. Les suivants seront ajoutés
+        # au même format avec les prochaines étapes de la mission.
+        if index == 0:
+            from interface.checkpoint import CheckpointWindow
+            from missions.mission_01 import CHECKPOINT
+
+            CheckpointWindow(
+                self.root,
+                CHECKPOINT,
+                on_pass=lambda: self._mark_objective_complete(index),
+            )
+        else:
+            messagebox.showinfo(
+                "Checkpoint en préparation",
+                "Le questionnaire de cette étape sera ajouté avec les prochains éléments de mission.",
+                parent=self.root,
+            )
+
+    def _mark_objective_complete(self, index: int) -> None:
+        if index in self.completed_objectives:
             return
         self.completed_objectives.add(index)
         if len(self.completed_objectives) < len(OBJECTIVES):
@@ -457,7 +471,7 @@ class Desktop:
                 0, 0, width * count / 5, 4, fill=COLORS["accent"], outline="",
             )
         self.complete_button.configure(
-            text="ENQUÊTE TERMINÉE" if count == 5 else "VALIDER CETTE ÉTAPE",
+            text="ENQUÊTE TERMINÉE" if count == 5 else "PASSER LE CHECKPOINT",
             bg=COLORS["card"] if count == 5 else COLORS["accent_dark"],
         )
         self.progress_label.configure(text=f"{count} objectif(s) validé(s) sur 5")
