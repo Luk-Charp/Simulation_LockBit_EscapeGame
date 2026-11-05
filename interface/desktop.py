@@ -48,50 +48,28 @@ class Desktop:
         )
         wallpaper.bind("<Configure>", lambda event: self._center_wallpaper(wallpaper, event))
 
-        shortcut = tk.Frame(
-            self.desktop_root, bg="#26384f", width=112, height=112,
-            cursor="hand2",
-        )
-        shortcut.place(x=28, y=28)
-        shortcut.pack_propagate(False)
-        app_icon = tk.Canvas(
-            shortcut, width=58, height=58, bg="#26384f",
-            highlightthickness=0, cursor="hand2",
-        )
-        app_icon.pack(pady=(4, 2))
-        app_icon.create_rectangle(7, 5, 51, 53, fill="#f4f6f8", outline="#d6e0eb", width=2)
-        app_icon.create_rectangle(12, 11, 46, 18, fill="#b21f35", outline="")
-        app_icon.create_text(29, 35, text="FBI", fill="#183b5b", font=("Segoe UI", 13, "bold"))
-        app_name = tk.Label(
-            shortcut, text="Opération Lockdown",
-            bg="#26384f", fg="#ffffff", font=("Segoe UI", 8, "bold"),
-            wraplength=108, justify="center", cursor="hand2",
-        )
-        app_name.pack()
-        for widget in (shortcut, app_icon, app_name):
-            widget.bind("<Double-Button-1>", lambda _event: self._open_investigation())
-            widget.bind("<Button-1>", lambda _event: self._select_desktop_icon(shortcut, True))
-            widget.bind("<Button-3>", lambda _event: self._select_desktop_icon(shortcut, True))
+        desktop_apps = [
+            ("▣", "Opération Lockdown", "investigation"),
+            ("✉", "Messagerie", "mail"),
+            ("▤", "Dossier enquête", "case"),
+            ("⌘", "Terminal", "terminal"),
+            ("◎", "OSINT", "osint"),
+            ("⊕", "Cartographie", "map"),
+        ]
+        for index, (symbol, title, app_id) in enumerate(desktop_apps):
+            column, row = index // 3, index % 3
+            shortcut = tk.Frame(self.desktop_root, bg="#26384f", width=116, height=104, cursor="hand2")
+            shortcut.place(x=22 + column * 128, y=22 + row * 116)
+            shortcut.pack_propagate(False)
+            icon = tk.Label(shortcut, text=symbol, bg="#26384f", fg="#f1f5f9", font=("Segoe UI Symbol", 34), cursor="hand2")
+            icon.pack(pady=(2, 1))
+            label = tk.Label(shortcut, text=title, bg="#26384f", fg="#ffffff", font=("Segoe UI", 8), wraplength=110, justify="center", cursor="hand2")
+            label.pack()
+            for widget in (shortcut, icon, label):
+                widget.bind("<Double-Button-1>", lambda _event, selected=app_id: self._open_application(selected))
+                widget.bind("<Button-1>", lambda _event, frame=shortcut: self._select_desktop_icon(frame, True))
 
-        panel = tk.Frame(self.desktop_root, bg="#172638", height=48)
-        panel.pack(side="bottom", fill="x")
-        panel.pack_propagate(False)
-        menu = tk.Label(
-            panel, text="☰", bg="#172638", fg="#ffffff",
-            font=("Segoe UI Symbol", 20), width=3, cursor="hand2",
-        )
-        menu.pack(side="left", padx=(8, 4))
-        menu.bind("<Button-1>", lambda _event: self._open_investigation())
-        tk.Frame(panel, bg="#40536a", width=1).pack(side="left", fill="y", pady=9)
-        tk.Label(
-            panel, text="Debian", bg="#172638", fg="#e5edf6",
-            font=("Segoe UI", 9, "bold"),
-        ).pack(side="left", padx=12)
-        tk.Label(
-            panel, text="●  Système opérationnel",
-            bg="#172638", fg="#a9c8b4", font=("Segoe UI", 8),
-        ).pack(side="right", padx=18)
-
+        self._build_taskbar(self.desktop_root)
     @staticmethod
     def _center_wallpaper(canvas: tk.Canvas, event) -> None:
         canvas.delete("center_text")
@@ -136,7 +114,6 @@ class Desktop:
         self.objective_rows = []
         self._build_top_bar()
         self._build_workspace()
-        self._build_taskbar()
         self._refresh_objectives()
         self.root.protocol("WM_DELETE_WINDOW", self._close_investigation)
 
@@ -459,17 +436,22 @@ class Desktop:
             widget.configure(bg=icon_bg if widget in widgets[1:3] else card_bg)
 
     def _open_application(self, app_id: str) -> None:
-        if app_id == "mail":
-            MailWindow(self.root)
+        """Ouvre les applications depuis le bureau Debian."""
+        if app_id == "investigation":
+            self._open_investigation()
+        elif app_id == "mail":
+            MailWindow(self.desktop_root)
         elif app_id == "case":
-            CaseFileWindow(self.root)
+            CaseFileWindow(self.desktop_root)
         else:
             names = {"terminal": "Terminal", "osint": "OSINT", "map": "Cartographie"}
             name = names.get(app_id, "Application")
-            messagebox.showinfo(
-                name, f"L'application « {name} » sera développée dans une prochaine étape.",
-                parent=self.root,
-            )
+            window = tk.Toplevel(self.desktop_root)
+            window.title(name)
+            window.configure(bg=COLORS["background"])
+            window.geometry("760x520")
+            tk.Label(window, text=name, bg=COLORS["taskbar"], fg=COLORS["text"], font=("Segoe UI", 16, "bold"), padx=22, pady=18).pack(fill="x")
+            tk.Label(window, text="Cette application sera enrichie au fil du développement.", bg=COLORS["background"], fg=COLORS["muted"], font=("Segoe UI", 11), padx=24, pady=24).pack(anchor="w")
 
     def _build_taskbar(self) -> None:
         """Construit une véritable barre des tâches horizontale, inspirée de Linux."""
