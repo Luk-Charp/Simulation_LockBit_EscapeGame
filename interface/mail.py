@@ -63,7 +63,7 @@ class MailWindow:
         )
         self._add_message_card(
             messages, "Consignes de mission — Opération Lockdown",
-            "Agent spécial · FBI Cyber Division", "Aujourd'hui · 09:30",
+            "Agent spécial Thomas Reed · FBI Cyber Division", "Aujourd'hui · 09:30",
             "supervisor",
         )
 
@@ -123,8 +123,8 @@ class MailWindow:
 
         if message_id == "victim":
             subject = "URGENT — Attaque informatique"
-            sender = "Sophie Martin <s.martin@hexatech.example>"
-            recipient = "FBI Cyber Division <cyber.division@fbi.example>"
+            sender = "Sophie Martin <s.martin@hexatech.com>"
+            recipient = "FBI Cyber Division <thomas.reed@fbi-cyber.com>"
             date = "Mercredi 4 novembre 2026 à 09:14"
             body = (
                 "Bonjour, ici Sophie Martin, responsable informatique de la société HexaTech Industries.\n\n"
@@ -141,8 +141,8 @@ class MailWindow:
             )
         else:
             subject = "Consignes de mission — Opération Lockdown"
-            sender = "Agent spécial responsable <cyber.division@fbi.example>"
-            recipient = "Cellule d'investigation numérique <equipe@fbi.example>"
+            sender = "Agent spécial Thomas Reed <thomas.reed@fbi-cyber.com>"
+            recipient = "Cellule d'investigation numérique <cellule@fbi-cyber.com>"
             date = "Mercredi 4 novembre 2026 à 09:30"
             body = (
                 "Bonjour,\n\n"
@@ -159,7 +159,7 @@ class MailWindow:
                 "5. RÉDIGER LE RAPPORT\n"
                 "Présentez le scénario le plus probable, les preuves qui le soutiennent, les infrastructures repérées et les limites de votre analyse.\n\n"
                 "RÈGLES : vous travaillez sur une simulation. Ne modifiez pas les preuves et n'effectuez aucune action sur un système réel. Recoupez les informations et ne formulez aucune accusation sans preuves suffisantes.\n\n"
-                "Bonne enquête,\nAgent spécial responsable\nFBI Cyber Division"
+                "Bonne enquête,\nAgent spécial Thomas Reed\nFBI Cyber Division"
             )
 
         # En-tête de courriel structuré comme dans un client de messagerie classique.
