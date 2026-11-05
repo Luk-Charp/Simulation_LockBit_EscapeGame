@@ -1,26 +1,24 @@
-"""Bureau principal simulé de la cellule d'enquête."""
+"""Bureau principal sobre de la cellule d'investigation."""
 
 import tkinter as tk
 from tkinter import messagebox
 
-
-
-# Palette commune de l'interface.
-COLORS = {
-    "background": "#101827",
-    "background_light": "#18263a",
-    "panel": "#1d2d43",
-    "panel_hover": "#2a405d",
-    "text": "#edf3fb",
-    "muted": "#a7b6ca",
-    "blue": "#55a6f7",
-    "green": "#55d6a3",
-    "border": "#30445e",
-    "taskbar": "#0b1220",
-}
-
-
 from interface.mail import MailWindow
+
+
+COLORS = {
+    "background": "#111827",
+    "surface": "#172235",
+    "card": "#1b2a40",
+    "card_hover": "#223650",
+    "text": "#edf2f7",
+    "muted": "#9eacbf",
+    "accent": "#55b7d9",
+    "accent_dark": "#244c63",
+    "green": "#65c69a",
+    "border": "#2c4058",
+    "taskbar": "#0c1421",
+}
 
 
 class Desktop:
@@ -35,182 +33,175 @@ class Desktop:
         self._build_taskbar()
 
     def _build_top_bar(self) -> None:
-        """Barre supérieure rappelant l'environnement d'une cellule cyber."""
-        top_bar = tk.Frame(
-            self.root,
-            bg=COLORS["taskbar"],
-            height=48,
-            highlightthickness=0,
+        top = tk.Frame(self.root, bg=COLORS["taskbar"], height=58)
+        top.pack(side="top", fill="x")
+        top.pack_propagate(False)
+
+        brand = tk.Frame(top, bg=COLORS["taskbar"])
+        brand.pack(side="left", padx=30)
+        tk.Label(
+            brand, text="FBI", bg=COLORS["taskbar"], fg=COLORS["text"],
+            font=("Segoe UI", 16, "bold"),
+        ).pack(side="left")
+        tk.Frame(brand, bg=COLORS["accent"], width=2, height=26).pack(
+            side="left", padx=13, pady=15
         )
-        top_bar.pack(side="top", fill="x")
-        top_bar.pack_propagate(False)
+        tk.Label(
+            brand, text="CYBER DIVISION", bg=COLORS["taskbar"],
+            fg=COLORS["muted"], font=("Segoe UI", 10, "bold"),
+        ).pack(side="left")
 
         tk.Label(
-            top_bar,
-            text="◈  FBI  /  CYBER DIVISION",
-            bg=COLORS["taskbar"],
-            fg=COLORS["text"],
-            font=("Segoe UI", 12, "bold"),
-        ).pack(side="left", padx=20)
-
-        tk.Label(
-            top_bar,
-            text="POSTE D'INVESTIGATION  •  OPÉRATION LOCKDOWN",
-            bg=COLORS["taskbar"],
-            fg=COLORS["muted"],
-            font=("Segoe UI", 9),
-        ).pack(side="right", padx=20)
+            top, text="OPÉRATION LOCKDOWN",
+            bg=COLORS["taskbar"], fg=COLORS["text"],
+            font=("Segoe UI", 10, "bold"),
+        ).pack(side="right", padx=30)
 
     def _build_workspace(self) -> None:
-        """Zone centrale du bureau et raccourcis des applications."""
         workspace = tk.Frame(self.root, bg=COLORS["background"])
         workspace.pack(fill="both", expand=True)
 
         content = tk.Frame(workspace, bg=COLORS["background"])
-        content.place(relx=0.075, rely=0.105, relwidth=0.85, relheight=0.79)
+        content.place(relx=0.07, rely=0.105, relwidth=0.86, relheight=0.80)
 
         tk.Label(
-            content,
-            text="CELLULE D'INVESTIGATION NUMÉRIQUE",
-            bg=COLORS["background"],
-            fg=COLORS["blue"],
-            font=("Segoe UI", 10, "bold"),
-        ).pack(anchor="w")
-
-        tk.Label(
-            content,
-            text="Bienvenue, agent.",
-            bg=COLORS["background"],
-            fg=COLORS["text"],
-            font=("Segoe UI", 30, "bold"),
-        ).pack(anchor="w", pady=(12, 5))
-
-        tk.Label(
-            content,
-            text=(
-                "Une entreprise française a signalé une attaque informatique.\n"
-                "Ouvrez les outils de votre poste pour commencer l'enquête."
-            ),
-            bg=COLORS["background"],
-            fg=COLORS["muted"],
-            justify="left",
-            font=("Segoe UI", 12),
-        ).pack(anchor="w", pady=(0, 30))
-
-        apps_frame = tk.Frame(content, bg=COLORS["background"])
-        apps_frame.pack(anchor="w")
-
-        applications = [
-            ("✉", "Messagerie", "Consulter les communications", "mail"),
-            ("▤", "Dossier d'enquête", "Retrouver les indices", "case"),
-            ("⌘", "Terminal", "Outils informatiques", "terminal"),
-            ("◎", "OSINT", "Recherche en sources ouvertes", "osint"),
-            ("🌐", "Carte", "Visualiser les pistes", "map"),
-        ]
-
-        for symbol, title, description, app_id in applications:
-            self._create_app_card(
-                apps_frame,
-                symbol,
-                title,
-                description,
-                app_id,
-            )
-
-        info_panel = tk.Frame(
-            content,
-            bg=COLORS["background_light"],
-            highlightbackground=COLORS["border"],
-            highlightthickness=1,
-            padx=16,
-            pady=13,
-        )
-        info_panel.pack(fill="x", anchor="w", pady=(34, 0))
-
-        tk.Label(
-            info_panel,
-            text="BRIEFING DE MISSION",
-            bg=COLORS["background_light"],
-            fg=COLORS["blue"],
+            content, text="CELLULE D'INVESTIGATION NUMÉRIQUE",
+            bg=COLORS["background"], fg=COLORS["accent"],
             font=("Segoe UI", 9, "bold"),
         ).pack(anchor="w")
 
         tk.Label(
-            info_panel,
+            content, text="Bienvenue, agent.",
+            bg=COLORS["background"], fg=COLORS["text"],
+            font=("Segoe UI", 29, "bold"),
+        ).pack(anchor="w", pady=(12, 6))
+
+        tk.Label(
+            content,
             text=(
-                "Votre objectif : comprendre l'attaque, analyser les éléments disponibles "
-                "et transmettre des conclusions étayées aux autorités compétentes."
+                "Une entreprise française a signalé une attaque informatique. "
+                "Consultez les outils mis à votre disposition pour débuter l'enquête."
             ),
-            bg=COLORS["background_light"],
-            fg=COLORS["text"],
-            justify="left",
-            wraplength=850,
-        ).pack(anchor="w", pady=(6, 0))
+            bg=COLORS["background"], fg=COLORS["muted"],
+            font=("Segoe UI", 11), wraplength=900, justify="left",
+        ).pack(anchor="w", pady=(0, 28))
+
+        section = tk.Frame(content, bg=COLORS["background"])
+        section.pack(fill="x", anchor="w")
+        tk.Label(
+            section, text="OUTILS D'INVESTIGATION",
+            bg=COLORS["background"], fg=COLORS["muted"],
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w", pady=(0, 10))
+
+        apps = tk.Frame(section, bg=COLORS["background"])
+        apps.pack(anchor="w")
+        applications = [
+            ("✉", "Messagerie", "Consulter les communications", "mail"),
+            ("▤", "Dossier d'enquête", "Centraliser les indices", "case"),
+            ("⌘", "Terminal", "Analyser les données", "terminal"),
+            ("◎", "OSINT", "Rechercher en sources ouvertes", "osint"),
+            ("⊕", "Carte", "Visualiser les pistes", "map"),
+        ]
+        for symbol, title, description, app_id in applications:
+            self._create_app_card(apps, symbol, title, description, app_id)
+
+        briefing = tk.Frame(
+            content, bg=COLORS["surface"],
+            highlightbackground=COLORS["border"], highlightthickness=1,
+            padx=20, pady=17,
+        )
+        briefing.pack(fill="x", pady=(30, 0))
+
+        tk.Label(
+            briefing, text="BRIEFING DE MISSION",
+            bg=COLORS["surface"], fg=COLORS["accent"],
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w")
+        tk.Label(
+            briefing,
+            text=(
+                "Votre objectif : comprendre le déroulement de l'attaque, "
+                "analyser les preuves disponibles et formuler des conclusions "
+                "étayées pour les autorités compétentes."
+            ),
+            bg=COLORS["surface"], fg=COLORS["text"],
+            font=("Segoe UI", 10), justify="left", wraplength=1050,
+        ).pack(anchor="w", pady=(7, 0))
+
+        progress = tk.Frame(content, bg=COLORS["background"])
+        progress.pack(fill="x", pady=(28, 0))
+        tk.Label(
+            progress, text="DÉROULEMENT DE L'ENQUÊTE",
+            bg=COLORS["background"], fg=COLORS["muted"],
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w", pady=(0, 10))
+
+        stages = tk.Frame(progress, bg=COLORS["background"])
+        stages.pack(fill="x")
+        for index, stage in enumerate(
+            ("Incident", "Intrusion", "Infrastructure", "Attribution", "Rapport")
+        ):
+            item = tk.Frame(stages, bg=COLORS["background"])
+            item.pack(side="left", expand=True, fill="x")
+            color = COLORS["accent"] if index == 0 else COLORS["muted"]
+            tk.Label(
+                item, text=f"{index + 1:02d}  /  {stage.upper()}",
+                bg=COLORS["background"], fg=color,
+                font=("Segoe UI", 8, "bold" if index == 0 else "normal"),
+            ).pack(anchor="w")
 
     def _create_app_card(
-        self,
-        parent: tk.Frame,
-        symbol: str,
-        title: str,
-        description: str,
-        app_id: str,
+        self, parent: tk.Frame, symbol: str, title: str,
+        description: str, app_id: str,
     ) -> None:
-        """Crée un raccourci cliquable pour une application du bureau."""
         card = tk.Frame(
-            parent,
-            bg=COLORS["panel"],
-            width=154,
-            height=142,
-            highlightbackground=COLORS["border"],
-            highlightthickness=1,
+            parent, bg=COLORS["card"], width=185, height=142,
+            highlightbackground=COLORS["border"], highlightthickness=1,
         )
         card.pack(side="left", padx=(0, 12), pady=2)
         card.pack_propagate(False)
 
-        icon_button = tk.Button(
-            card,
-            text=symbol,
-            command=lambda selected=app_id: self._open_application(selected),
-            bg=COLORS["panel"],
-            fg=COLORS["blue"],
-            activebackground=COLORS["panel_hover"],
-            activeforeground=COLORS["text"],
-            relief="flat",
-            borderwidth=0,
-            cursor="hand2",
-            font=("Segoe UI Symbol", 27, "bold"),
+        icon = tk.Label(
+            card, text=symbol, bg=COLORS["card"], fg=COLORS["accent"],
+            font=("Segoe UI Symbol", 25),
         )
-        icon_button.pack(fill="x", pady=(12, 0))
+        icon.pack(anchor="w", padx=16, pady=(14, 8))
 
-        title_label = tk.Label(
-            card,
-            text=title,
-            bg=COLORS["panel"],
-            fg=COLORS["text"],
-            font=("Segoe UI", 9, "bold"),
+        heading = tk.Label(
+            card, text=title, bg=COLORS["card"], fg=COLORS["text"],
+            font=("Segoe UI", 10, "bold"), anchor="w",
         )
-        title_label.pack(pady=(5, 1))
+        heading.pack(fill="x", padx=16)
 
-        description_label = tk.Label(
-            card,
-            text=description,
-            bg=COLORS["panel"],
-            fg=COLORS["muted"],
-            font=("Segoe UI", 7),
-            wraplength=135,
+        subtitle = tk.Label(
+            card, text=description, bg=COLORS["card"], fg=COLORS["muted"],
+            font=("Segoe UI", 8), anchor="w", wraplength=150, justify="left",
         )
-        description_label.pack()
+        subtitle.pack(fill="x", padx=16, pady=(5, 0))
 
-        # Le titre et la description déclenchent également l'application.
-        for widget in (card, title_label, description_label):
+        widgets = (card, icon, heading, subtitle)
+        for widget in widgets:
+            widget.configure(cursor="hand2")
             widget.bind(
                 "<Button-1>",
                 lambda _event, selected=app_id: self._open_application(selected),
             )
-            widget.configure(cursor="hand2")
+            widget.bind(
+                "<Enter>",
+                lambda _event, elements=widgets: self._set_card_color(elements, COLORS["card_hover"]),
+            )
+            widget.bind(
+                "<Leave>",
+                lambda _event, elements=widgets: self._set_card_color(elements, COLORS["card"]),
+            )
+
+    @staticmethod
+    def _set_card_color(widgets: tuple, color: str) -> None:
+        for widget in widgets:
+            widget.configure(bg=color)
 
     def _open_application(self, app_id: str) -> None:
-        """Ouvre l'outil sélectionné ou indique qu'il sera développé ensuite."""
         app_names = {
             "mail": "Messagerie",
             "case": "Dossier d'enquête",
@@ -219,7 +210,6 @@ class Desktop:
             "map": "Carte",
         }
         app_name = app_names.get(app_id, "Application")
-
         if app_id == "mail":
             MailWindow(self.root)
             return
@@ -231,27 +221,17 @@ class Desktop:
         )
 
     def _build_taskbar(self) -> None:
-        """Barre inférieure avec l'état de la simulation."""
-        taskbar = tk.Frame(
-            self.root,
-            bg=COLORS["taskbar"],
-            height=38,
-        )
+        taskbar = tk.Frame(self.root, bg=COLORS["taskbar"], height=36)
         taskbar.pack(side="bottom", fill="x")
         taskbar.pack_propagate(False)
 
         tk.Label(
-            taskbar,
-            text="●  SYSTÈME OPÉRATIONNEL",
-            bg=COLORS["taskbar"],
-            fg=COLORS["green"],
+            taskbar, text="●  SYSTÈME OPÉRATIONNEL",
+            bg=COLORS["taskbar"], fg=COLORS["green"],
             font=("Segoe UI", 8, "bold"),
-        ).pack(side="left", padx=16)
-
+        ).pack(side="left", padx=18)
         tk.Label(
-            taskbar,
-            text="SIMULATION PÉDAGOGIQUE  •  DONNÉES FICTIVES",
-            bg=COLORS["taskbar"],
-            fg=COLORS["muted"],
+            taskbar, text="SIMULATION PÉDAGOGIQUE  •  DONNÉES FICTIVES",
+            bg=COLORS["taskbar"], fg=COLORS["muted"],
             font=("Segoe UI", 8),
-        ).pack(side="right", padx=16)
+        ).pack(side="right", padx=18)
