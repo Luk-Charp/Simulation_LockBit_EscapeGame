@@ -50,8 +50,23 @@ class Desktop:
             "map": ("#28634f", "#8cdbad", "#ffffff"),
         }
         primary, accent, light = colors.get(app_id, ("#40536a", "#ffffff", "#ffffff"))
-        canvas.create_rectangle(*coords((5, 5, 59, 59)), fill=primary, outline="")
-        canvas.create_rectangle(*coords((5, 5, 59, 59)), outline="#ffffff", width=max(1, int(scale)))
+        if app_id == "investigation":
+            # Insigne rond, sans cadre carré parasite autour du logo.
+            canvas.create_oval(
+                *coords((5, 5, 59, 59)), fill=primary,
+                outline=accent, width=max(2, int(3 * scale)),
+            )
+            canvas.create_polygon(
+                *coords((16, 17, 48, 17, 45, 34, 32, 49, 19, 34)),
+                fill=light, outline=accent, width=max(1, int(1.5 * scale)),
+            )
+            canvas.create_text(
+                *coords((32, 28)), text="FBI", fill=primary,
+                font=("Segoe UI", max(7, int(11 * scale)), "bold"),
+            )
+        else:
+            canvas.create_rectangle(*coords((5, 5, 59, 59)), fill=primary, outline="")
+            canvas.create_rectangle(*coords((5, 5, 59, 59)), outline="#ffffff", width=max(1, int(scale)))
         if app_id == "mail":
             canvas.create_rectangle(*coords((15, 19, 49, 45)), fill=light, outline="")
             canvas.create_line(*coords((15, 20, 32, 34, 49, 20)), fill=primary, width=max(2, int(3*scale)), smooth=True)
@@ -73,10 +88,6 @@ class Desktop:
             canvas.create_line(*coords((25, 12, 25, 45)), fill=primary, width=max(1, int(2*scale)))
             canvas.create_line(*coords((39, 18, 39, 51)), fill=primary, width=max(1, int(2*scale)))
             canvas.create_oval(*coords((29, 23, 38, 32)), fill="#d94d58", outline="")
-        else:
-            canvas.create_oval(*coords((13, 13, 51, 51)), outline=accent, width=max(2, int(3*scale)))
-            canvas.create_polygon(*coords((32, 17, 43, 29, 32, 45, 21, 29)), fill=light, outline=accent, width=max(1, int(2*scale)))
-            canvas.create_text(*coords((32, 31)), text="FBI", fill=primary, font=("Segoe UI", max(6, int(10*scale)), "bold"))
         return canvas
 
     def _build_debian_desktop(self) -> None:
