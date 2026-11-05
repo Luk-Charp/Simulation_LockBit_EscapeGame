@@ -35,9 +35,23 @@ class CheckpointWindow:
         info = tk.Frame(self.window, bg=COLORS["card"], padx=18, pady=10)
         info.pack(fill="x", padx=20, pady=(16, 10))
         total = len(self.checkpoint["questions"])
-        tk.Label(info, text=f"{total} QUESTIONS  •  SCORE MINIMUM : {self.checkpoint['pass_score']}/{total}",
-                 bg=COLORS["card"], fg=COLORS["accent"],
-                 font=("Segoe UI", 9, "bold")).pack(anchor="w")
+        self.progress_value = tk.Label(
+            info, text=f"PROGRESSION  •  0/{total} RÉPONSES",
+            bg=COLORS["card"], fg=COLORS["accent"],
+            font=("Segoe UI", 9, "bold"),
+        )
+        self.progress_value.pack(anchor="w")
+        self.progress_canvas = tk.Canvas(
+            info, height=5, bg=COLORS["border"], highlightthickness=0, bd=0,
+        )
+        self.progress_canvas.pack(fill="x", pady=(8, 7))
+        self.progress_canvas.bind("<Configure>", lambda _event: self._update_progress())
+        tk.Label(
+            info,
+            text=f"{total} QUESTIONS  •  SCORE MINIMUM : {self.checkpoint['pass_score']}/{total}",
+            bg=COLORS["card"], fg=COLORS["muted"],
+            font=("Segoe UI", 8),
+        ).pack(anchor="w")
 
         outer = tk.Frame(self.window, bg=COLORS["background"])
         outer.pack(fill="both", expand=True, padx=20, pady=(0, 10))
@@ -83,11 +97,25 @@ class CheckpointWindow:
                            bg=COLORS["surface"], fg=COLORS["text"],
                            activebackground=COLORS["surface"], selectcolor=COLORS["card"],
                            font=("Segoe UI", 9), anchor="w", justify="left",
-                           wraplength=690, padx=3, pady=2).pack(fill="x", anchor="w")
+                           wraplength=690, padx=3, pady=3,
+                           command=self._update_progress).pack(fill="x", anchor="w")
         question["_feedback_widget"] = tk.Label(card, text="", bg=COLORS["surface"],
                                                 fg=COLORS["muted"], font=("Segoe UI", 8),
                                                 wraplength=700, justify="left")
         question["_feedback_widget"].pack(anchor="w", pady=(5, 0))
+
+    def _update_progress(self) -> None:
+        """Met à jour le repère de progression sans modifier le score requis."""
+        answered = sum(variable.get() >= 0 for variable in self.variables)
+        total = len(self.variables)
+        self.progress_value.configure(text=f"PROGRESSION  •  {answered}/{total} RÉPONSES")
+        self.progress_canvas.delete("all")
+        width = self.progress_canvas.winfo_width()
+        if width > 1 and total:
+            self.progress_canvas.create_rectangle(
+                0, 0, width * answered / total, 5,
+                fill=COLORS["accent"], outline="",
+            )
 
     def _submit(self) -> None:
         if any(variable.get() < 0 for variable in self.variables):
