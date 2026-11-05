@@ -219,7 +219,6 @@ class VoicemailWindow:
                 self.is_paused = False
                 self._set_play_button_text("Ⅱ  Mettre en pause")
                 self.status_label.configure(text="LECTURE EN COURS")
-                self._watch_playback()
             else:
                 pygame.mixer.music.play()
                 self.is_playing = True
