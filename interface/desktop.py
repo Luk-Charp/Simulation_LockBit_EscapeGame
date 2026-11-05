@@ -32,6 +32,53 @@ class Desktop:
         self.investigation_window = None
         self._build_debian_desktop()
 
+    def _draw_app_icon(self, parent: tk.Misc, app_id: str, size: int, background: str) -> tk.Canvas:
+        """Dessine une icône vectorielle cohérente, sans police ni ressource externe."""
+        canvas = tk.Canvas(
+            parent, width=size, height=size, bg=background,
+            highlightthickness=0, bd=0,
+        )
+        scale = size / 64
+        def coords(values):
+            return tuple(value * scale for value in values)
+        colors = {
+            "investigation": ("#173e67", "#f4c95d", "#ffffff"),
+            "mail": ("#245b91", "#8fd3f4", "#ffffff"),
+            "case": ("#a86a22", "#f5c66b", "#fff4d8"),
+            "terminal": ("#263746", "#75d6b0", "#ffffff"),
+            "osint": ("#245d72", "#79d6df", "#ffffff"),
+            "map": ("#28634f", "#8cdbad", "#ffffff"),
+        }
+        primary, accent, light = colors.get(app_id, ("#40536a", "#ffffff", "#ffffff"))
+        canvas.create_rectangle(*coords((5, 5, 59, 59)), fill=primary, outline="")
+        canvas.create_rectangle(*coords((5, 5, 59, 59)), outline="#ffffff", width=max(1, int(scale)))
+        if app_id == "mail":
+            canvas.create_rectangle(*coords((15, 19, 49, 45)), fill=light, outline="")
+            canvas.create_line(*coords((15, 20, 32, 34, 49, 20)), fill=primary, width=max(2, int(3*scale)), smooth=True)
+        elif app_id == "case":
+            canvas.create_rectangle(*coords((12, 22, 52, 47)), fill=accent, outline="")
+            canvas.create_rectangle(*coords((17, 16, 32, 25)), fill=accent, outline="")
+            canvas.create_rectangle(*coords((12, 27, 52, 47)), fill=light, outline="")
+            canvas.create_rectangle(*coords((12, 27, 52, 47)), outline=accent, width=max(1, int(2*scale)))
+        elif app_id == "terminal":
+            canvas.create_rectangle(*coords((12, 15, 52, 49)), fill="#101b29", outline=accent, width=max(1, int(2*scale)))
+            canvas.create_line(*coords((19, 25, 26, 31, 19, 37)), fill=accent, width=max(2, int(3*scale)))
+            canvas.create_line(*coords((30, 38, 42, 38)), fill=light, width=max(2, int(3*scale)))
+        elif app_id == "osint":
+            canvas.create_oval(*coords((14, 12, 45, 43)), outline=light, width=max(2, int(3*scale)))
+            canvas.create_line(*coords((37, 36, 51, 51)), fill=accent, width=max(3, int(5*scale)))
+            canvas.create_oval(*coords((21, 19, 38, 36)), outline=accent, width=max(1, int(2*scale)))
+        elif app_id == "map":
+            canvas.create_polygon(*coords((12, 17, 25, 12, 39, 18, 52, 12, 52, 45, 39, 51, 25, 45, 12, 51)), fill=light, outline="")
+            canvas.create_line(*coords((25, 12, 25, 45)), fill=primary, width=max(1, int(2*scale)))
+            canvas.create_line(*coords((39, 18, 39, 51)), fill=primary, width=max(1, int(2*scale)))
+            canvas.create_oval(*coords((29, 23, 38, 32)), fill="#d94d58", outline="")
+        else:
+            canvas.create_oval(*coords((13, 13, 51, 51)), outline=accent, width=max(2, int(3*scale)))
+            canvas.create_polygon(*coords((32, 17, 43, 29, 32, 45, 21, 29)), fill=light, outline=accent, width=max(1, int(2*scale)))
+            canvas.create_text(*coords((32, 31)), text="FBI", fill=primary, font=("Segoe UI", max(6, int(10*scale)), "bold"))
+        return canvas
+
     def _build_debian_desktop(self) -> None:
         """Affiche le bureau Debian sans ouvrir automatiquement l'enquête."""
         wallpaper = tk.Canvas(
@@ -49,25 +96,38 @@ class Desktop:
         wallpaper.bind("<Configure>", lambda event: self._center_wallpaper(wallpaper, event))
 
         desktop_apps = [
-            ("▣", "Opération Lockdown", "investigation"),
-            ("✉", "Messagerie", "mail"),
-            ("▤", "Dossier enquête", "case"),
-            ("⌘", "Terminal", "terminal"),
-            ("◎", "OSINT", "osint"),
-            ("⊕", "Cartographie", "map"),
+            ("Opération Lockdown", "investigation"),
+            ("Messagerie", "mail"),
+            ("Dossier enquête", "case"),
+            ("Terminal", "terminal"),
+            ("OSINT", "osint"),
+            ("Cartographie", "map"),
         ]
-        for index, (symbol, title, app_id) in enumerate(desktop_apps):
+        for index, (title, app_id) in enumerate(desktop_apps):
             column, row = index // 3, index % 3
-            shortcut = tk.Frame(self.desktop_root, bg="#26384f", width=116, height=104, cursor="hand2")
+            shortcut = tk.Frame(
+                self.desktop_root, bg="#26384f", width=116, height=104,
+                cursor="hand2",
+            )
             shortcut.place(x=22 + column * 128, y=22 + row * 116)
             shortcut.pack_propagate(False)
-            icon = tk.Label(shortcut, text=symbol, bg="#26384f", fg="#f1f5f9", font=("Segoe UI Symbol", 34), cursor="hand2")
-            icon.pack(pady=(2, 1))
-            label = tk.Label(shortcut, text=title, bg="#26384f", fg="#ffffff", font=("Segoe UI", 8), wraplength=110, justify="center", cursor="hand2")
+            icon = self._draw_app_icon(shortcut, app_id, 56, "#26384f")
+            icon.pack(pady=(2, 3))
+            label = tk.Label(
+                shortcut, text=title, bg="#26384f", fg="#ffffff",
+                font=("Segoe UI", 8), wraplength=110, justify="center",
+                cursor="hand2",
+            )
             label.pack()
             for widget in (shortcut, icon, label):
-                widget.bind("<Double-Button-1>", lambda _event, selected=app_id: self._open_application(selected))
-                widget.bind("<Button-1>", lambda _event, frame=shortcut: self._select_desktop_icon(frame, True))
+                widget.bind(
+                    "<Double-Button-1>",
+                    lambda _event, selected=app_id: self._open_application(selected),
+                )
+                widget.bind(
+                    "<Button-1>",
+                    lambda _event, frame=shortcut: self._select_desktop_icon(frame, True),
+                )
 
         self._build_taskbar(self.desktop_root)
     @staticmethod
@@ -484,14 +544,14 @@ class Desktop:
         app_group.pack(side="left", padx=8, pady=4)
 
         applications = [
-            ("✉", "Messagerie", "mail"),
-            ("▤", "Dossier", "case"),
-            ("⌘", "Terminal", "terminal"),
-            ("◎", "OSINT", "osint"),
-            ("⊕", "Cartographie", "map"),
+            ("Messagerie", "mail"),
+            ("Dossier", "case"),
+            ("Terminal", "terminal"),
+            ("OSINT", "osint"),
+            ("Cartographie", "map"),
         ]
         self.dock_items = []
-        for symbol, title, app_id in applications:
+        for title, app_id in applications:
             item = tk.Frame(
                 app_group, bg=COLORS["taskbar"], width=82, height=62,
                 cursor="hand2",
@@ -499,11 +559,8 @@ class Desktop:
             item.pack(side="left", padx=2)
             item.pack_propagate(False)
 
-            icon = tk.Label(
-                item, text=symbol, bg=COLORS["taskbar"], fg=COLORS["on_dark"],
-                font=("Segoe UI Symbol", 24), cursor="hand2",
-            )
-            icon.pack(pady=(0, 0))
+            icon = self._draw_app_icon(item, app_id, 34, COLORS["taskbar"])
+            icon.pack(pady=(3, 0))
             label = tk.Label(
                 item, text=title, bg=COLORS["taskbar"], fg=COLORS["on_dark_muted"],
                 font=("Segoe UI", 7), cursor="hand2",
