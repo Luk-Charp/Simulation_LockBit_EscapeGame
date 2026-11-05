@@ -40,7 +40,7 @@ class Desktop:
         brand = tk.Frame(top, bg=COLORS["taskbar"])
         brand.pack(side="left", padx=30)
         tk.Label(
-            brand, text="FBI", bg=COLORS["taskbar"], fg=COLORS["text"],
+            brand, text="FBI", bg=COLORS["taskbar"], fg=COLORS["on_dark"],
             font=("Georgia", 21, "bold"),
         ).pack(side="left")
         tk.Frame(brand, bg=COLORS["gold"], width=3, height=34).pack(
@@ -63,7 +63,7 @@ class Desktop:
         right.pack(side="right", padx=30)
         tk.Label(
             right, text="CELLULE D'INVESTIGATION",
-            bg=COLORS["taskbar"], fg=COLORS["muted"],
+            bg=COLORS["taskbar"], fg=COLORS["on_dark_muted"],
             font=("Segoe UI", 8, "bold"),
         ).pack(side="left", padx=(0, 18))
         tk.Label(
@@ -244,7 +244,7 @@ class Desktop:
 
         self.complete_button = tk.Label(
             sidebar, text="VALIDER CETTE ÉTAPE",
-            bg=COLORS["accent_dark"], fg=COLORS["text"],
+            bg=COLORS["accent_dark"], fg=COLORS["button_text"],
             font=("Segoe UI", 8, "bold"), padx=10, pady=12,
             cursor="hand2",
         )
