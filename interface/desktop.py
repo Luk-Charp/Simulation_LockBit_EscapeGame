@@ -368,7 +368,7 @@ class Desktop:
             )
             status_label.pack(anchor="w", pady=(4, 0))
             self.objective_rows.append(
-                (row, accent, number_label, title_label, status_label)
+                (row, accent, number_label, text_frame, title_label, status_label)
             )
             for widget in (row, accent, number_label, text_frame, title_label, status_label):
                 widget.bind(
@@ -445,14 +445,14 @@ class Desktop:
 
     def _refresh_objectives(self) -> None:
         unlocked = len(self.completed_objectives)
-        for index, (row, accent, number, title, status) in enumerate(self.objective_rows):
+        for index, (row, accent, number, text_frame, title, status) in enumerate(self.objective_rows):
             done = index in self.completed_objectives
             available = index <= unlocked
             selected = index == self.selected_objective and available
             bg = COLORS["card"] if selected else COLORS["surface"]
             row.configure(bg=bg)
             accent.configure(bg=COLORS["accent"] if selected else COLORS["green"] if done else bg)
-            for widget in (number, title, status):
+            for widget in (number, text_frame, title, status):
                 widget.configure(bg=bg)
             number.configure(fg=COLORS["green"] if done else COLORS["accent"] if available else COLORS["muted"])
             title.configure(fg=COLORS["text"] if available else COLORS["muted"])
