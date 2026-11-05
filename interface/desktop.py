@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter import messagebox
 
-from interface.mail import MailWindow
 
 
 # Palette commune de l'interface.
@@ -19,6 +18,9 @@ COLORS = {
     "border": "#30445e",
     "taskbar": "#0b1220",
 }
+
+
+from interface.mail import MailWindow
 
 
 class Desktop:
