@@ -13,6 +13,9 @@ COLORS = {
     "gold": "#c5a45b",
     "border": "#cbd5e1",
     "taskbar": "#102b49",
+    "on_dark": "#ffffff",
+    "on_dark_muted": "#c4d1df",
+    "button_text": "#ffffff",
 }
 
 
