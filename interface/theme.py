@@ -1,17 +1,18 @@
-"""Palette visuelle partagée par les fenêtres de l'application."""
+"""Palette institutionnelle inspirée de l'identité visuelle des agences fédérales américaines."""
 
 COLORS = {
-    "background": "#0b1220",
-    "surface": "#111c2e",
-    "card": "#16243a",
-    "card_hover": "#1c304b",
-    "text": "#f3f7fc",
-    "muted": "#91a2b8",
-    "accent": "#63c9e8",
-    "accent_dark": "#173b50",
-    "green": "#69d6a4",
-    "border": "#263a54",
-    "taskbar": "#080f1b",
+    "background": "#f2f5f9",
+    "surface": "#ffffff",
+    "card": "#e8eef5",
+    "card_hover": "#dce6f0",
+    "text": "#142b45",
+    "muted": "#62758b",
+    "accent": "#1c5688",
+    "accent_dark": "#123b63",
+    "green": "#287a57",
+    "gold": "#c5a45b",
+    "border": "#cbd5e1",
+    "taskbar": "#102b49",
 }
 
 
