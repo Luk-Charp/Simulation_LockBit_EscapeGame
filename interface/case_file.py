@@ -88,15 +88,67 @@ class CaseFileWindow:
 
         notebook = ttk.Notebook(wrapper, style="Case.TNotebook", takefocus=False)
         notebook.pack(fill="both", expand=True)
-        overview = tk.Frame(notebook, bg=COLORS["card"])
-        timeline = tk.Frame(notebook, bg=COLORS["card"])
-        evidence = tk.Frame(notebook, bg=COLORS["card"])
+        overview, overview_content = self._create_scrollable_tab(notebook)
+        timeline, timeline_content = self._create_scrollable_tab(notebook)
+        evidence, evidence_content = self._create_scrollable_tab(notebook)
         notebook.add(overview, text="Vue d'ensemble")
         notebook.add(timeline, text="Chronologie")
         notebook.add(evidence, text="Éléments disponibles")
-        self._build_overview(overview)
-        self._build_timeline(timeline)
-        self._build_evidence(evidence)
+        self._build_overview(overview_content)
+        self._build_timeline(timeline_content)
+        self._build_evidence(evidence_content)
+
+    def _create_scrollable_tab(self, notebook: ttk.Notebook):
+        """Crée un onglet dont le contenu reste accessible même s'il dépasse la fenêtre."""
+        tab = tk.Frame(notebook, bg=COLORS["card"])
+        canvas = tk.Canvas(
+            tab, bg=COLORS["card"], highlightthickness=0, borderwidth=0,
+        )
+        scrollbar = tk.Scrollbar(
+            tab, orient="vertical", command=canvas.yview,
+            bg=COLORS["surface"], troughcolor=COLORS["card"],
+            activebackground=COLORS["accent"],
+        )
+        content = tk.Frame(canvas, bg=COLORS["card"])
+        content_window = canvas.create_window(
+            (0, 0), window=content, anchor="nw",
+        )
+
+        def update_scroll_region(_event=None):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        def resize_content(event):
+            canvas.itemconfigure(content_window, width=event.width)
+
+        content.bind("<Configure>", update_scroll_region)
+        canvas.bind("<Configure>", resize_content)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Molette souris et trackpad : le défilement ne s'active que sur cet onglet.
+        def on_mousewheel(event):
+            if getattr(event, "delta", 0):
+                canvas.yview_scroll(int(-event.delta / 120) or (-1 if event.delta > 0 else 1), "units")
+            elif getattr(event, "num", None) == 4:
+                canvas.yview_scroll(-1, "units")
+            elif getattr(event, "num", None) == 5:
+                canvas.yview_scroll(1, "units")
+
+        def bind_wheel(_event=None):
+            canvas.bind_all("<MouseWheel>", on_mousewheel)
+            canvas.bind_all("<Button-4>", on_mousewheel)
+            canvas.bind_all("<Button-5>", on_mousewheel)
+
+        def unbind_wheel(_event=None):
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        canvas.bind("<Enter>", bind_wheel)
+        canvas.bind("<Leave>", unbind_wheel)
+        return tab, content
 
     def _section_title(self, parent: tk.Frame, title: str, subtitle: str) -> None:
         tk.Label(
