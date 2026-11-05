@@ -15,6 +15,7 @@ class MailWindow:
         self.window.configure(bg=COLORS["background"])
         center_window(self.window, 1160, 780)
         self.message_items = []
+        self.selected_message = "victim"
         self._build_interface()
 
     def _build_interface(self) -> None:
@@ -83,6 +84,7 @@ class MailWindow:
             parent, bg=bg,
             highlightbackground=COLORS["accent"] if selected else COLORS["border"],
             highlightthickness=1, padx=10, pady=12, cursor="hand2",
+            takefocus=1,
         )
         card.pack(fill="x", padx=8, pady=4)
         title = tk.Label(
@@ -105,8 +107,26 @@ class MailWindow:
         self.message_items.append((message_id, card, title, sender_label, date_label))
         for widget in (card, title, sender_label, date_label):
             widget.bind("<Button-1>", lambda _event, mid=message_id: self._select_message(mid))
+        card.bind("<Enter>", lambda _event, mid=message_id: self._set_message_hover(mid, True))
+        card.bind("<Leave>", lambda _event, mid=message_id: self._set_message_hover(mid, False))
+        card.bind("<FocusIn>", lambda _event, mid=message_id: self._set_message_hover(mid, True))
+        card.bind("<FocusOut>", lambda _event, mid=message_id: self._set_message_hover(mid, False))
+        card.bind("<Return>", lambda _event, mid=message_id: self._select_message(mid))
+
+    def _set_message_hover(self, message_id: str, hovered: bool) -> None:
+        for mid, card, title, sender, date in self.message_items:
+            active = mid == self.selected_message
+            bg = COLORS["card_hover"] if active or (mid == message_id and hovered) else COLORS["card"]
+            card.configure(
+                bg=bg,
+                highlightbackground=COLORS["accent"] if active or (mid == message_id and hovered) else COLORS["border"],
+                highlightthickness=2 if mid == message_id and hovered else 1,
+            )
+            for widget in (title, sender, date):
+                widget.configure(bg=bg)
 
     def _select_message(self, message_id: str) -> None:
+        self.selected_message = message_id
         for mid, card, title, sender, date in self.message_items:
             bg = COLORS["card_hover"] if mid == message_id else COLORS["card"]
             card.configure(
