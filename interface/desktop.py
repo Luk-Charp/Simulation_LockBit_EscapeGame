@@ -360,31 +360,37 @@ class Desktop:
             ),
         )
 
-        intro = tk.Frame(content, bg=COLORS["background"])
-        intro.pack(fill="x", pady=(0, 30))
+        intro = tk.Frame(
+            content, bg=COLORS["surface"], padx=26, pady=24,
+            highlightbackground=COLORS["border"], highlightthickness=1,
+        )
+        intro.pack(fill="x", pady=(0, 24))
         tk.Label(
-            intro, text="FEDERAL BUREAU OF INVESTIGATION     /     CYBER DIVISION",
-            bg=COLORS["background"], fg=COLORS["accent"],
+            intro, text="FBI  /  CYBER DIVISION",
+            bg=COLORS["surface"], fg=COLORS["accent"],
             font=("Segoe UI", 9, "bold"),
         ).pack(anchor="w")
         tk.Label(
             intro, text="Bonjour, agents.",
-            bg=COLORS["background"], fg=COLORS["text"],
-            font=("Segoe UI", 30, "bold"),
+            bg=COLORS["surface"], fg=COLORS["text"],
+            font=("Segoe UI", 28, "bold"),
         ).pack(anchor="w", pady=(10, 7))
         tk.Label(
             intro,
             text="Une cyberattaque a été signalée chez HexaTech Industries. "
                  "Votre cellule est chargée d'établir les faits et de reconstituer l'incident.",
-            bg=COLORS["background"], fg=COLORS["muted"],
+            bg=COLORS["surface"], fg=COLORS["muted"],
             font=("Segoe UI", 11), wraplength=900, justify="left",
         ).pack(anchor="w")
+        tk.Frame(intro, bg=COLORS["gold"], height=3).pack(
+            anchor="w", fill="x", pady=(18, 0),
+        )
 
         lower = tk.Frame(content, bg=COLORS["background"])
         lower.pack(fill="x", pady=(26, 0))
 
         briefing = tk.Frame(
-            lower, bg=COLORS["surface"], padx=22, pady=20,
+            lower, bg=COLORS["surface"], padx=24, pady=22,
             highlightbackground=COLORS["border"], highlightthickness=1,
         )
         briefing.pack(side="left", fill="both", expand=True, padx=(0, 12))
