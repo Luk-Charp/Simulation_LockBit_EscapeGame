@@ -39,7 +39,7 @@ class MailWindow:
             sidebar, text="DOSSIERS", bg=COLORS["card"],
             fg=COLORS["muted"], font=("Segoe UI", 9, "bold")
         ).pack(anchor="w", padx=16, pady=(18, 12))
-        for folder in ("Boîte de réception  (3)", "Messages envoyés", "Archives"):
+        for folder in ("Boîte de réception  (1)", "Messages envoyés", "Archives"):
             tk.Label(
                 sidebar, text=folder, bg=COLORS["card"], fg=COLORS["text"],
                 font=("Segoe UI", 9), anchor="w"
@@ -52,30 +52,40 @@ class MailWindow:
             messages, text="MESSAGES RÉCENTS", bg=COLORS["card"],
             fg=COLORS["muted"], font=("Segoe UI", 9, "bold")
         ).pack(anchor="w", padx=14, pady=(18, 12))
-        for subject, sender, date, urgent in (
-            ("URGENT — Attaque informatique", "Sophie Martin · HexaTech Industries", "Aujourd'hui · 09:14", True),
-            ("Disponibilité de l'équipe IT", "Marc Dubois · HexaTech Industries", "Hier · 16:42", False),
-            ("Contrat de maintenance", "Support informatique", "Hier · 10:05", False),
-        ):
-            bg = COLORS["card_hover"] if urgent else COLORS["card"]
-            item = tk.Frame(messages, bg=bg, highlightbackground=COLORS["border"], highlightthickness=1, padx=10, pady=12)
-            item.pack(fill="x", padx=8, pady=4)
-            tk.Label(item, text=subject, bg=bg, fg=COLORS["text"], font=("Segoe UI", 9, "bold"), wraplength=225, justify="left").pack(anchor="w")
-            tk.Label(item, text=sender, bg=bg, fg=COLORS["muted"], font=("Segoe UI", 8), wraplength=225, justify="left").pack(anchor="w", pady=(5, 2))
-            tk.Label(item, text=date, bg=bg, fg=COLORS["accent"] if urgent else COLORS["muted"], font=("Segoe UI", 8)).pack(anchor="w")
+        item = tk.Frame(
+            messages, bg=COLORS["card_hover"],
+            highlightbackground=COLORS["accent"], highlightthickness=1,
+            padx=10, pady=12,
+        )
+        item.pack(fill="x", padx=8, pady=4)
+        tk.Label(
+            item, text="CONSIGNES DE MISSION — OPÉRATION LOCKDOWN",
+            bg=COLORS["card_hover"], fg=COLORS["text"],
+            font=("Segoe UI", 9, "bold"), wraplength=225, justify="left",
+        ).pack(anchor="w")
+        tk.Label(
+            item, text="Agent spécial · FBI Cyber Division",
+            bg=COLORS["card_hover"], fg=COLORS["muted"],
+            font=("Segoe UI", 8),
+        ).pack(anchor="w", pady=(5, 2))
+        tk.Label(
+            item, text="Aujourd'hui · 09:30",
+            bg=COLORS["card_hover"], fg=COLORS["accent"],
+            font=("Segoe UI", 8),
+        ).pack(anchor="w")
 
         reading = tk.Frame(body, bg=COLORS["surface"], highlightbackground=COLORS["border"], highlightthickness=1)
         reading.pack(side="left", fill="both", expand=True)
         tk.Label(
-            reading, text="URGENT — Attaque informatique",
+            reading, text="Consignes de mission — Opération Lockdown",
             bg=COLORS["surface"], fg=COLORS["text"],
             font=("Segoe UI", 17, "bold"), wraplength=520, justify="left"
         ).pack(anchor="w", padx=22, pady=(22, 8))
         details = (
-            "De : Sophie Martin <s.martin@hexatech.example>\n"
+            "De : Agent spécial responsable <cyber.division@fbi.example>\n"
             "À : FBI Cyber Division\n"
-            "Date : 4 novembre 2026, 09:14\n"
-            "Entreprise : HexaTech Industries (France)"
+            "Date : 4 novembre 2026, 09:30\n"
+            "Objet : Instructions officielles — Affaire #LK-2026-1104"
         )
         tk.Label(
             reading, text=details, bg=COLORS["surface"],
@@ -84,16 +94,33 @@ class MailWindow:
 
         message = (
             "Bonjour,\n\n"
-            "Notre entreprise est victime d'une attaque informatique depuis cette nuit. "
-            "Plusieurs serveurs sont devenus inaccessibles et de nombreux fichiers portent "
-            "désormais une extension inhabituelle. Un message affiché sur les postes "
-            "réclame une rançon et mentionne le groupe LockBit.\n\n"
-            "Nos équipes ont isolé une partie du réseau, mais nous ne savons pas encore "
-            "comment les attaquants sont entrés ni quelles données ont été consultées. "
-            "Nous vous transmettons les premiers éléments dont nous disposons.\n\n"
-            "Pouvez-vous nous aider à comprendre ce qui s'est passé et à préserver les "
-            "preuves utiles à l'enquête ?\n\n"
-            "Cordialement,\nSophie Martin\nResponsable informatique — HexaTech Industries"
+            "Vous êtes officiellement affectés à l'enquête concernant la cyberattaque "
+            "subie par HexaTech Industries. Le nom LockBit apparaît dans le message "
+            "laissé aux employés, mais cette revendication doit être vérifiée.\n\n"
+            "Votre mission est de reconstituer le déroulement de l'incident, d'analyser "
+            "les traces disponibles et de présenter des conclusions appuyées par des preuves. "
+            "Vous disposez d'environ 45 minutes. Suivez les cinq étapes ci-dessous.\n\n"
+            "1. EXAMINER L'INCIDENT\n"
+            "Consultez le dossier d'enquête, le signalement et les pièces jointes. "
+            "Identifiez les faits connus, les horaires et les systèmes touchés.\n\n"
+            "2. RECONSTITUER L'INTRUSION\n"
+            "Analysez les journaux informatiques. Repérez les connexions inhabituelles, "
+            "les événements suspects et leur chronologie. Cherchez comment les attaquants "
+            "ont pu accéder au réseau.\n\n"
+            "3. ÉTUDIER L'INFRASTRUCTURE\n"
+            "Examinez les adresses IP, les noms de domaine et les indices techniques. "
+            "Utilisez les outils OSINT et la carte. Une adresse IP ne suffit pas à "
+            "identifier une personne.\n\n"
+            "4. CROISER LES INDICES\n"
+            "Comparez vos découvertes avec les informations disponibles sur LockBit. "
+            "Distinguez les faits vérifiés, les hypothèses et les éléments inconnus.\n\n"
+            "5. RÉDIGER LE RAPPORT\n"
+            "Présentez le scénario le plus probable, les preuves qui le soutiennent, "
+            "les infrastructures repérées et les limites de votre analyse.\n\n"
+            "RÈGLES : vous travaillez sur une simulation. Ne modifiez pas les preuves "
+            "et n'effectuez aucune action sur un système réel. Recoupez les informations "
+            "et ne formulez aucune accusation sans preuves suffisantes.\n\n"
+            "Bonne enquête,\nAgent spécial responsable\nFBI Cyber Division"
         )
         tk.Label(
             reading, text=message, bg=COLORS["surface"],
